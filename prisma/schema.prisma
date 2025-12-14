@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ContentPair {
+  id        String   @id @default(cuid())
+  imageA    String
+  imageB    String
+  textA     String
+  textB     String
+  aiSide    String // "A" or "B"
+  createdAt DateTime @default(now())
+  votes     Vote[]
+}
+
+model Vote {
+  id              String      @id @default(cuid())
+  pairId          String
+  userGuessForAI  String // "A" or "B"
+  preference      String // "A" or "B"
+  isCorrect       Boolean
+  createdAt       DateTime    @default(now())
+  
+  pair            ContentPair @relation(fields: [pairId], references: [id])
+}

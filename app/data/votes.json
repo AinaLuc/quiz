@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1765694462583",
+    "pairId": "pair-1",
+    "userGuessForAI": "A",
+    "preference": "B",
+    "isCorrect": true,
+    "timestamp": "2025-12-14T06:41:02.583Z"
+  },
+  {
+    "id": "1765694479265",
+    "pairId": "pair-2",
+    "userGuessForAI": "A",
+    "preference": "B",
+    "isCorrect": false,
+    "timestamp": "2025-12-14T06:41:19.265Z"
+  },
+  {
+    "id": "1765700124995",
+    "pairId": "pair-1765700102281",
+    "userGuessForAI": "A",
+    "preference": "B",
+    "isCorrect": true,
+    "timestamp": "2025-12-14T08:15:24.995Z"
+  }
+]
