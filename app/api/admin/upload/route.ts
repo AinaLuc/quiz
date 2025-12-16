@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
-import { uploadImage } from '../../../../lib/storage';
+import { prisma } from '@/lib/prisma';
+import { uploadImage } from '@/lib/storage';
 
 export async function POST(request: Request) {
     try {
