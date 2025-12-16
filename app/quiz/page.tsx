@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import VotingCard from './components/VotingCard';
+import VotingCard from '../components/VotingCard';
 
 interface ContentPair {
   id: string;
