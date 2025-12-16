@@ -31,3 +31,9 @@ model Vote {
   
   pair            ContentPair @relation(fields: [pairId], references: [id])
 }
+
+model Participant {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
