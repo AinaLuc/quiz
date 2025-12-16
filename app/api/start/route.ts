@@ -21,8 +21,15 @@ export async function POST(request: Request) {
         }
 
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Start error:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        // Debug info for user
+        return NextResponse.json({
+            error: error.message || 'Internal Server Error',
+            stack: error.stack,
+            envCheck: process.env.DATABASE_URL ? 'DB_URL_PRESENT' : 'DB_URL_MISSING'
+        }, { status: 500 });
     }
 }
+}
+```
