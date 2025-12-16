@@ -27,7 +27,7 @@ export async function GET() {
         return NextResponse.json({
             totalVotes,
             accuracy,
-            votes: votes.map(v => ({
+            votes: votes.map((v: any) => ({
                 ...v,
                 timestamp: v.createdAt // Map for frontend compatibility
             }))
