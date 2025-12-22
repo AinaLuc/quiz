@@ -21,8 +21,8 @@ export default function VotingCard({ pair, onVote }: VotingCardProps) {
     };
 
     return (
-        <div className="glass-panel p-8 rounded-2xl max-w-4xl w-full mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-xl shadow-slate-200/50">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="glass-panel p-6 sm:p-12 rounded-3xl max-w-5xl w-full mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-xl shadow-slate-200/50">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                 {/* Option A */}
                 <div className="space-y-4 flex flex-col h-full">
                     <div className="relative aspect-square bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 group shadow-sm transition-all hover:shadow-md">
@@ -146,7 +146,7 @@ export default function VotingCard({ pair, onVote }: VotingCardProps) {
                 </div>
 
                 {/* Submit Button */}
-                <div className="flex justify-center pt-2">
+                <div className="flex justify-center pt-8">
                     <button
                         onClick={handleSubmit}
                         disabled={!selectedAiGuess || !selectedPreference}
