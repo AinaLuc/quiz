@@ -25,41 +25,45 @@ export default function VotingCard({ pair, onVote }: VotingCardProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 {/* Option A */}
                 <div className="space-y-4">
-                    <div className="relative aspect-square bg-slate-50 rounded-xl overflow-hidden border border-slate-200 group shadow-md transition-shadow hover:shadow-lg">
-                        {/* Placeholder for Image A */}
-                        <div className="absolute inset-0 flex items-center justify-center text-slate-400 bg-slate-50">
-                            {pair.imageA.includes('placeholder') ? (
-                                <span className="text-lg font-medium tracking-wide">Image A</span>
-                            ) : (
-                                <img src={pair.imageA} alt="Option A" className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105" />
-                            )}
+                    {pair.imageA && (
+                        <div className="relative aspect-square bg-slate-50 rounded-xl overflow-hidden border border-slate-200 group shadow-md transition-shadow hover:shadow-lg">
+                            {/* Placeholder for Image A */}
+                            <div className="absolute inset-0 flex items-center justify-center text-slate-400 bg-slate-50">
+                                {pair.imageA.includes('placeholder') ? (
+                                    <span className="text-lg font-medium tracking-wide">Image A</span>
+                                ) : (
+                                    <img src={pair.imageA} alt="Option A" className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105" />
+                                )}
+                            </div>
+                            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold border border-slate-200 shadow-sm text-slate-700">
+                                Option A
+                            </div>
                         </div>
-                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold border border-slate-200 shadow-sm text-slate-700">
-                            Option A
-                        </div>
-                    </div>
-                    <div className="p-5 bg-white rounded-xl border border-slate-100 min-h-[100px] shadow-sm">
-                        <p className="text-slate-600 text-sm leading-relaxed">{pair.textA}</p>
+                    )}
+                    <div className="p-5 bg-white rounded-xl border border-slate-100 min-h-[100px] shadow-sm flex items-center justify-center text-center">
+                        <p className="text-slate-600 text-lg leading-relaxed font-medium">{pair.textA}</p>
                     </div>
                 </div>
 
                 {/* Option B */}
                 <div className="space-y-4">
-                    <div className="relative aspect-square bg-slate-50 rounded-xl overflow-hidden border border-slate-200 group shadow-md transition-shadow hover:shadow-lg">
-                        {/* Placeholder for Image B */}
-                        <div className="absolute inset-0 flex items-center justify-center text-slate-400 bg-slate-50">
-                            {pair.imageB.includes('placeholder') ? (
-                                <span className="text-lg font-medium tracking-wide">Image B</span>
-                            ) : (
-                                <img src={pair.imageB} alt="Option B" className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105" />
-                            )}
+                    {pair.imageB && (
+                        <div className="relative aspect-square bg-slate-50 rounded-xl overflow-hidden border border-slate-200 group shadow-md transition-shadow hover:shadow-lg">
+                            {/* Placeholder for Image B */}
+                            <div className="absolute inset-0 flex items-center justify-center text-slate-400 bg-slate-50">
+                                {pair.imageB.includes('placeholder') ? (
+                                    <span className="text-lg font-medium tracking-wide">Image B</span>
+                                ) : (
+                                    <img src={pair.imageB} alt="Option B" className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105" />
+                                )}
+                            </div>
+                            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold border border-slate-200 shadow-sm text-slate-700">
+                                Option B
+                            </div>
                         </div>
-                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold border border-slate-200 shadow-sm text-slate-700">
-                            Option B
-                        </div>
-                    </div>
-                    <div className="p-5 bg-white rounded-xl border border-slate-100 min-h-[100px] shadow-sm">
-                        <p className="text-slate-600 text-sm leading-relaxed">{pair.textB}</p>
+                    )}
+                    <div className="p-5 bg-white rounded-xl border border-slate-100 min-h-[100px] shadow-sm flex items-center justify-center text-center">
+                        <p className="text-slate-600 text-lg leading-relaxed font-medium">{pair.textB}</p>
                     </div>
                 </div>
             </div>
@@ -72,8 +76,8 @@ export default function VotingCard({ pair, onVote }: VotingCardProps) {
                         <button
                             onClick={() => setSelectedAiGuess('A')}
                             className={`px-8 py-3.5 rounded-2xl font-semibold transition-all duration-200 ${selectedAiGuess === 'A'
-                                    ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30 scale-105 ring-2 ring-sky-300'
-                                    : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
+                                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30 scale-105 ring-2 ring-sky-300'
+                                : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
                                 }`}
                         >
                             Option A is AI
@@ -81,8 +85,8 @@ export default function VotingCard({ pair, onVote }: VotingCardProps) {
                         <button
                             onClick={() => setSelectedAiGuess('B')}
                             className={`px-8 py-3.5 rounded-2xl font-semibold transition-all duration-200 ${selectedAiGuess === 'B'
-                                    ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30 scale-105 ring-2 ring-sky-300'
-                                    : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
+                                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30 scale-105 ring-2 ring-sky-300'
+                                : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
                                 }`}
                         >
                             Option B is AI
@@ -97,8 +101,8 @@ export default function VotingCard({ pair, onVote }: VotingCardProps) {
                         <button
                             onClick={() => setSelectedPreference('A')}
                             className={`px-8 py-3.5 rounded-2xl font-semibold transition-all duration-200 ${selectedPreference === 'A'
-                                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105 ring-2 ring-emerald-300'
-                                    : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
+                                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105 ring-2 ring-emerald-300'
+                                : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
                                 }`}
                         >
                             I prefer A
@@ -106,8 +110,8 @@ export default function VotingCard({ pair, onVote }: VotingCardProps) {
                         <button
                             onClick={() => setSelectedPreference('B')}
                             className={`px-8 py-3.5 rounded-2xl font-semibold transition-all duration-200 ${selectedPreference === 'B'
-                                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105 ring-2 ring-emerald-300'
-                                    : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
+                                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105 ring-2 ring-emerald-300'
+                                : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
                                 }`}
                         >
                             I prefer B

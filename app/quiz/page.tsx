@@ -5,8 +5,8 @@ import VotingCard from '../components/VotingCard';
 
 interface ContentPair {
   id: string;
-  imageA: string;
-  imageB: string;
+  imageA?: string;
+  imageB?: string;
   textA: string;
   textB: string;
   aiSide: 'A' | 'B';

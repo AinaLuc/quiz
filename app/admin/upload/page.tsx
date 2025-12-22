@@ -43,8 +43,8 @@ export default function AdminUploadPage() {
                     <div className="space-y-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
                         <h3 className="font-semibold text-lg text-slate-700">Option A</h3>
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-slate-600">Image A</label>
-                            <input type="file" name="imageA" accept="image/*" required className="w-full text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 transition-all" />
+                            <label className="block text-sm font-medium text-slate-600">Image A (Optional)</label>
+                            <input type="file" name="imageA" accept="image/*" className="w-full text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 transition-all" />
                         </div>
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-slate-600">Text A</label>
@@ -56,8 +56,8 @@ export default function AdminUploadPage() {
                     <div className="space-y-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
                         <h3 className="font-semibold text-lg text-slate-700">Option B</h3>
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-slate-600">Image B</label>
-                            <input type="file" name="imageB" accept="image/*" required className="w-full text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 transition-all" />
+                            <label className="block text-sm font-medium text-slate-600">Image B (Optional)</label>
+                            <input type="file" name="imageB" accept="image/*" className="w-full text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 transition-all" />
                         </div>
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-slate-600">Text B</label>

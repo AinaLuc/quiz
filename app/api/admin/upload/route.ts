@@ -11,21 +11,21 @@ export async function POST(request: Request) {
         const textB = formData.get('textB') as string;
         const aiSide = formData.get('aiSide') as string;
 
-        if (!imageA || !imageB || !textA || !textB || !aiSide) {
-            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        if (!textA || !textB || !aiSide) {
+            return NextResponse.json({ error: 'Missing required text fields' }, { status: 400 });
         }
 
-        // Upload images (Cloudinary or Local)
+        // Upload images if present
         const [imageAPath, imageBPath] = await Promise.all([
-            uploadImage(imageA),
-            uploadImage(imageB)
+            imageA && imageA.size > 0 ? uploadImage(imageA) : Promise.resolve(null),
+            imageB && imageB.size > 0 ? uploadImage(imageB) : Promise.resolve(null)
         ]);
 
         // Save to Database via Prisma
         const newPair = await prisma.contentPair.create({
             data: {
-                imageA: imageAPath,
-                imageB: imageBPath,
+                imageA: imageAPath || undefined,
+                imageB: imageBPath || undefined,
                 textA,
                 textB,
                 aiSide,

@@ -13,8 +13,8 @@ datasource db {
 
 model ContentPair {
   id        String   @id @default(cuid())
-  imageA    String
-  imageB    String
+  imageA    String?
+  imageB    String?
   textA     String
   textB     String
   aiSide    String // "A" or "B"
