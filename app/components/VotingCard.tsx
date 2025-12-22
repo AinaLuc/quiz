@@ -24,45 +24,59 @@ export default function VotingCard({ pair, onVote }: VotingCardProps) {
         <div className="glass-panel p-8 rounded-2xl max-w-4xl w-full mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-xl shadow-slate-200/50">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 {/* Option A */}
-                <div className="space-y-4">
-                    {pair.imageA && (
-                        <div className="relative aspect-square bg-slate-50 rounded-xl overflow-hidden border border-slate-200 group shadow-md transition-shadow hover:shadow-lg">
-                            {/* Placeholder for Image A */}
-                            <div className="absolute inset-0 flex items-center justify-center text-slate-400 bg-slate-50">
-                                {pair.imageA.includes('placeholder') ? (
-                                    <span className="text-lg font-medium tracking-wide">Image A</span>
+                <div className="space-y-4 flex flex-col h-full">
+                    <div className="relative aspect-square bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 group shadow-sm transition-all hover:shadow-md">
+                        {/* Image or Placeholder */}
+                        <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
+                            {pair.imageA ? (
+                                pair.imageA.includes('placeholder') ? (
+                                    <span className="text-lg font-bold text-slate-300 tracking-wider">IMAGE A</span>
                                 ) : (
                                     <img src={pair.imageA} alt="Option A" className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105" />
-                                )}
-                            </div>
-                            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold border border-slate-200 shadow-sm text-slate-700">
-                                Option A
-                            </div>
+                                )
+                            ) : (
+                                <div className="flex flex-col items-center justify-center space-y-2 text-slate-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-12 h-12">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                    </svg>
+                                    <span className="text-xl font-black tracking-widest uppercase">No Image</span>
+                                </div>
+                            )}
                         </div>
-                    )}
-                    <div className="p-5 bg-white rounded-xl border border-slate-100 min-h-[100px] shadow-sm flex items-center justify-center text-center">
+                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold border border-slate-200 shadow-sm text-slate-700 z-10">
+                            Option A
+                        </div>
+                    </div>
+                    <div className="p-6 bg-white rounded-2xl border border-slate-100 flex-1 flex items-center justify-center text-center shadow-sm">
                         <p className="text-slate-600 text-lg leading-relaxed font-medium">{pair.textA}</p>
                     </div>
                 </div>
 
                 {/* Option B */}
-                <div className="space-y-4">
-                    {pair.imageB && (
-                        <div className="relative aspect-square bg-slate-50 rounded-xl overflow-hidden border border-slate-200 group shadow-md transition-shadow hover:shadow-lg">
-                            {/* Placeholder for Image B */}
-                            <div className="absolute inset-0 flex items-center justify-center text-slate-400 bg-slate-50">
-                                {pair.imageB.includes('placeholder') ? (
-                                    <span className="text-lg font-medium tracking-wide">Image B</span>
+                <div className="space-y-4 flex flex-col h-full">
+                    <div className="relative aspect-square bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 group shadow-sm transition-all hover:shadow-md">
+                        {/* Image or Placeholder */}
+                        <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
+                            {pair.imageB ? (
+                                pair.imageB.includes('placeholder') ? (
+                                    <span className="text-lg font-bold text-slate-300 tracking-wider">IMAGE B</span>
                                 ) : (
                                     <img src={pair.imageB} alt="Option B" className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105" />
-                                )}
-                            </div>
-                            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold border border-slate-200 shadow-sm text-slate-700">
-                                Option B
-                            </div>
+                                )
+                            ) : (
+                                <div className="flex flex-col items-center justify-center space-y-2 text-slate-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-12 h-12">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                    </svg>
+                                    <span className="text-xl font-black tracking-widest uppercase">No Image</span>
+                                </div>
+                            )}
                         </div>
-                    )}
-                    <div className="p-5 bg-white rounded-xl border border-slate-100 min-h-[100px] shadow-sm flex items-center justify-center text-center">
+                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold border border-slate-200 shadow-sm text-slate-700 z-10">
+                            Option B
+                        </div>
+                    </div>
+                    <div className="p-6 bg-white rounded-2xl border border-slate-100 flex-1 flex items-center justify-center text-center shadow-sm">
                         <p className="text-slate-600 text-lg leading-relaxed font-medium">{pair.textB}</p>
                     </div>
                 </div>
