@@ -86,30 +86,30 @@ export default function VotingCard({ pair, onVote }: VotingCardProps) {
                 {/* Question 1: Which is AI? */}
                 <div className="space-y-6">
                     <h3 className="text-xl font-semibold text-center text-slate-800">1. Which one do you think is created by AI?</h3>
-                    <div className="flex flex-wrap justify-center gap-4">
+                    <div className="flex flex-col sm:flex-row justify-center gap-4">
                         <button
                             onClick={() => setSelectedAiGuess('A')}
-                            className={`px-8 py-4 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-3 ${selectedAiGuess === 'A'
-                                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30 scale-105 ring-4 ring-sky-100'
+                            className={`w-full sm:w-auto px-8 py-4 rounded-2xl font-semibold transition-all duration-200 flex items-center justify-center sm:justify-start gap-3 ${selectedAiGuess === 'A'
+                                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30 scale-[1.02] sm:scale-105 ring-4 ring-sky-100'
                                 : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
                                 }`}
                         >
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${selectedAiGuess === 'A' ? 'border-white' : 'border-slate-300'}`}>
                                 {selectedAiGuess === 'A' && <div className="w-3 h-3 bg-white rounded-full" />}
                             </div>
-                            Option A is AI
+                            <span>Option A is AI</span>
                         </button>
                         <button
                             onClick={() => setSelectedAiGuess('B')}
-                            className={`px-8 py-4 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-3 ${selectedAiGuess === 'B'
-                                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30 scale-105 ring-4 ring-sky-100'
+                            className={`w-full sm:w-auto px-8 py-4 rounded-2xl font-semibold transition-all duration-200 flex items-center justify-center sm:justify-start gap-3 ${selectedAiGuess === 'B'
+                                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30 scale-[1.02] sm:scale-105 ring-4 ring-sky-100'
                                 : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
                                 }`}
                         >
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${selectedAiGuess === 'B' ? 'border-white' : 'border-slate-300'}`}>
                                 {selectedAiGuess === 'B' && <div className="w-3 h-3 bg-white rounded-full" />}
                             </div>
-                            Option B is AI
+                            <span>Option B is AI</span>
                         </button>
                     </div>
                 </div>
@@ -117,30 +117,30 @@ export default function VotingCard({ pair, onVote }: VotingCardProps) {
                 {/* Question 2: Which is Better? */}
                 <div className="space-y-6">
                     <h3 className="text-xl font-semibold text-center text-slate-800">2. Which one do you prefer?</h3>
-                    <div className="flex flex-wrap justify-center gap-4">
+                    <div className="flex flex-col sm:flex-row justify-center gap-4">
                         <button
                             onClick={() => setSelectedPreference('A')}
-                            className={`px-8 py-4 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-3 ${selectedPreference === 'A'
-                                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105 ring-4 ring-emerald-100'
+                            className={`w-full sm:w-auto px-8 py-4 rounded-2xl font-semibold transition-all duration-200 flex items-center justify-center sm:justify-start gap-3 ${selectedPreference === 'A'
+                                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-[1.02] sm:scale-105 ring-4 ring-emerald-100'
                                 : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
                                 }`}
                         >
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${selectedPreference === 'A' ? 'border-white' : 'border-slate-300'}`}>
                                 {selectedPreference === 'A' && <div className="w-3 h-3 bg-white rounded-full" />}
                             </div>
-                            I prefer A
+                            <span>I prefer A</span>
                         </button>
                         <button
                             onClick={() => setSelectedPreference('B')}
-                            className={`px-8 py-4 rounded-2xl font-semibold transition-all duration-200 flex items-center gap-3 ${selectedPreference === 'B'
-                                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-105 ring-4 ring-emerald-100'
+                            className={`w-full sm:w-auto px-8 py-4 rounded-2xl font-semibold transition-all duration-200 flex items-center justify-center sm:justify-start gap-3 ${selectedPreference === 'B'
+                                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-[1.02] sm:scale-105 ring-4 ring-emerald-100'
                                 : 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 border border-slate-200 shadow-sm'
                                 }`}
                         >
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${selectedPreference === 'B' ? 'border-white' : 'border-slate-300'}`}>
                                 {selectedPreference === 'B' && <div className="w-3 h-3 bg-white rounded-full" />}
                             </div>
-                            I prefer B
+                            <span>I prefer B</span>
                         </button>
                     </div>
                 </div>
