@@ -1,0 +1,8 @@
+flask
+openai
+openpyxl
+gunicorn
+python-dotenv
+stripe
+resend
+APScheduler
