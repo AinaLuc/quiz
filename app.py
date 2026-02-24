@@ -280,6 +280,12 @@ def unsubscribe(token):
     return f"<h1>You have been unsubscribed.</h1><p>We won't send any more emails to {email}.</p>"
 
 
+@app.route("/")
+def index():
+    """Renders the main landing page."""
+    return render_template("landing.html")
+
+
 @app.route("/quiz")
 def quiz_page():
     """Renders the standalone quiz form."""
