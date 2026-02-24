@@ -113,7 +113,7 @@ RULES:
 - The offer sentence must follow this formula exactly:
   I help [WHO] who [PROBLEM IN THEIR EXACT WORDS] to [TANGIBLE LIFE EVENT OUTCOME] 
   in [TIMEFRAME] without [THEIR NUMBER 1 OBJECTION]
-- include_paid_funnel should be true only if Q15 answer is NOT No budget right now
+- include_paid_funnel should be true only if Q15_interest is Yes AND Q15 answer is NOT No budget right now
 - Revenue fields (year1_low_units, year1_low_revenue, year1_high_units, year1_high_revenue,
   year2_units, year2_revenue, price_numeric) MUST be plain integers — no $ signs, no text
 - Funnel fields (monthly_clients, monthly_revenue_low, monthly_revenue_high) MUST be plain integers
@@ -353,6 +353,7 @@ def submit_quiz():
     for i in range(1, 17):
         key = f"Q{i}"
         answers[key] = form_data.get(key, "")
+    answers["Q15_interest"] = form_data.get("Q15_interest", "Yes")
 
     file_id = str(uuid.uuid4())[:8]
 
@@ -433,6 +434,7 @@ Q11 - Content medium: {answers.get('Q11', '')}
 Q12 - Audience size: {answers.get('Q12', '')}
 Q13 - Biggest fear: {answers.get('Q13', '')}
 Q14 - Hours per week: {answers.get('Q14', '')}
+Q15_interest - Open to paid marketing: {answers.get('Q15_interest', '')}
 Q15 - Ad budget: {answers.get('Q15', '')}
 Q16 - Success definition: "{answers.get('Q16', '')}"
 

@@ -85,7 +85,7 @@
         <div class="mb-10 text-center">
             <div class="inline-flex items-center space-x-2 bg-indigo-50 px-4 py-1.5 rounded-full mb-6">
                 <span id="step-indicator" class="text-xs font-bold text-indigo-600 uppercase tracking-widest">Question 1
-                    of 18</span>
+                    of 19</span>
             </div>
             <div class="progress-bar mb-2">
                 <div id="progress-fill" class="progress-fill" style="width: 5.5%"></div>
@@ -335,6 +335,27 @@
                     </div>
                 </div>
 
+                <!-- Q15_interest -->
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Paid Marketing.</h2>
+                    <p class="text-gray-500 mb-8">Are you open to using paid advertising (Google/Meta/etc) to grow your
+                        business?</p>
+                    <div class="grid gap-4">
+                        <label
+                            class="px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl flex items-center cursor-pointer hover:border-indigo-400 transition">
+                            <input type="radio" name="Q15_interest" value="Yes"
+                                class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 mr-4" checked>
+                            <span class="text-gray-700 font-semibold text-lg">Yes, I'm open to it</span>
+                        </label>
+                        <label
+                            class="px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl flex items-center cursor-pointer hover:border-indigo-400 transition">
+                            <input type="radio" name="Q15_interest" value="No"
+                                class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 mr-4">
+                            <span class="text-gray-700 font-semibold text-lg">No, I want organic growth only</span>
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Q15 -->
                 <div class="step">
                     <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Ad Budget.</h2>
@@ -354,6 +375,12 @@
                             <input type="radio" name="Q15" value="$500 - $2,000" class="mr-2"> <span>$500 -
                                 $2,000</span>
                         </label>
+                        <div class="col-span-2 mt-2">
+                            <input type="text" id="custom-budget" placeholder="Or enter custom (e.g. $5,000)"
+                                class="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl text-sm outline-none transition"
+                                oninput="document.querySelector('input[name=Q15][value=custom]').checked = true">
+                            <input type="radio" name="Q15" value="custom" class="hidden">
+                        </div>
                     </div>
                 </div>
 
@@ -454,6 +481,18 @@
                 // If moving past Step 2 (Email), trigger tracking
                 if (currentStep === 1) trackStart();
 
+                // Skip Ad Budget if not interested (Step 17 is index 16)
+                if (currentStep === 16) {
+                    const interest = document.querySelector('input[name="Q15_interest"]:checked').value;
+                    if (interest === 'No') {
+                        currentStep += 2;
+                        updateUI();
+                        const nextInput = steps[currentStep].querySelector('input, textarea, select');
+                        if (nextInput) nextInput.focus();
+                        return;
+                    }
+                }
+
                 currentStep++;
                 updateUI();
                 // Focus first input in next step
@@ -464,6 +503,15 @@
 
         prevBtn.addEventListener('click', () => {
             if (currentStep > 0) {
+                // Reverse skip logic
+                if (currentStep === 18) {
+                    const interest = document.querySelector('input[name="Q15_interest"]:checked').value;
+                    if (interest === 'No') {
+                        currentStep -= 2;
+                        updateUI();
+                        return;
+                    }
+                }
                 currentStep--;
                 updateUI();
             }
@@ -486,22 +534,32 @@
             }
         }
 
-        // Handle Custom Duration Value
+        // Handle Custom Duration and Budget Values
         form.addEventListener('submit', (e) => {
             // Show Loading Screen
             document.getElementById('loading-screen').classList.remove('hidden');
             document.getElementById('controls').classList.add('hidden');
 
-            const customInput = document.getElementById('custom-duration');
-            const customRadio = document.querySelector('input[name="Q9"][value="custom"]');
-            if (customRadio.checked && customInput.value.trim()) {
-                // Temporary hidden input to override the value
+            const customDurInput = document.getElementById('custom-duration');
+            const customDurRadio = document.querySelector('input[name="Q9"][value="custom"]');
+            if (customDurRadio && customDurRadio.checked && customDurInput.value.trim()) {
                 const hiddenInput = document.createElement('input');
                 hiddenInput.type = 'hidden';
                 hiddenInput.name = 'Q9';
-                hiddenInput.value = customInput.value;
+                hiddenInput.value = customDurInput.value;
                 form.appendChild(hiddenInput);
-                customRadio.name = 'Q9_ignore'; // disable the radio value
+                customDurRadio.name = 'Q9_ignore';
+            }
+
+            const customBudInput = document.getElementById('custom-budget');
+            const customBudRadio = document.querySelector('input[name="Q15"][value="custom"]');
+            if (customBudRadio && customBudRadio.checked && customBudInput.value.trim()) {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'Q15';
+                hiddenInput.value = customBudInput.value;
+                form.appendChild(hiddenInput);
+                customBudRadio.name = 'Q15_ignore';
             }
         });
 
