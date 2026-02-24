@@ -15,7 +15,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, numbers
 from openpyxl.utils import get_column_letter
 from dotenv import load_dotenv
 
-from emails import email_1_html, email_2_html, email_3_html, email_4_html, email_5_html
+from emails import email_1_html, email_2_html, email_3_html, email_4_html, email_5_html, email_abandoned_html
 
 load_dotenv()
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
@@ -262,7 +262,7 @@ def unsubscribe(token):
     if not data:
         return "<h1>Invalid or expired link.</h1>", 400
 
-    file_id = data["file_id"]
+    file_id = data.get("file_id")
     email = data["email"]
 
     # Remove all 5 possible scheduled jobs for this file_id
@@ -273,11 +273,54 @@ def unsubscribe(token):
         except:
             pass # Job might have already run
 
+    # Also check if there's an abandonment job to remove
+    try:
+        scheduler.remove_job(f"abandoned_{email}")
+    except:
+        pass
+
     # Also remove the token
     if token in _UNSUB_TOKENS:
         del _UNSUB_TOKENS[token]
 
     return f"<h1>You have been unsubscribed.</h1><p>We won't send any more emails to {email}.</p>"
+
+
+@app.route("/track-start", methods=["POST"])
+def track_start():
+    """
+    Called via AJAX when a user finishes the first 2 steps (Name/Email).
+    Schedules a 'did you finish?' email for 30 minutes from now.
+    """
+    data = request.get_json(silent=True) or {}
+    email = data.get("email")
+    name = data.get("name")
+    
+    if not email:
+        return jsonify({"success": False, "reason": "No email"}), 400
+
+    job_id = f"abandoned_{email}"
+    run_at = datetime.now() + timedelta(minutes=30)
+    
+    # Generate a temporary unsubscribe token for this follow-up
+    unsub_token = str(uuid.uuid4())
+    _UNSUB_TOKENS[unsub_token] = {"email": email}
+    unsubscribe_url = f"{request.host_url}unsubscribe/{unsub_token}"
+    
+    quiz_url = f"{request.host_url}quiz"
+    html = email_abandoned_html(name, quiz_url, unsubscribe_url)
+    
+    scheduler.add_job(
+        send_email,
+        trigger="date",
+        run_date=run_at,
+        args=[email, "Did you get interrupted?", html],
+        id=job_id,
+        replace_existing=True,
+    )
+    
+    app.logger.info(f"Scheduled abandonment follow-up for {email}")
+    return jsonify({"success": True})
 
 
 @app.route("/")
@@ -322,6 +365,12 @@ def submit_quiz():
     build_free_excel(plan, free_path)
     premium_path = f"/tmp/plan_{file_id}.xlsx"
     build_excel(plan, premium_path)
+
+    # Cancel any pending abandonment emails since they finished
+    try:
+        scheduler.remove_job(f"abandoned_{respondent_email}")
+    except:
+        pass
 
     # Schedule the 5-email drip sequence
     schedule_email_sequence(

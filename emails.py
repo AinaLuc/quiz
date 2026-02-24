@@ -264,3 +264,50 @@ def email_5_html(name: str, free_url: str, payment_url: str, unsubscribe_url: st
 </table>
 </body>
 </html>"""
+
+
+def email_abandoned_html(name: str, quiz_url: str, unsubscribe_url: str = "") -> str:
+    """Follow up for users who started but didn't finish the quiz (sent after ~30 mins)."""
+    first = name.split()[0] if name else "Coach"
+    return f"""<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#fdfcfb;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#fdfcfb;padding:40px 0;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:24px;overflow:hidden;max-width:600px;box-shadow:0 10px 30px rgba(0,0,0,0.03);">
+
+      <tr><td style="background:#4f46e5;padding:48px 40px;text-align:center;">
+        <h1 style="color:#ffffff;font-size:26px;margin:0;line-height:1.2;font-weight:800;">
+          Did you get interrupted, {first}?
+        </h1>
+      </td></tr>
+
+      <tr><td style="padding:48px 40px;">
+        <p style="font-size:16px;color:#3f3f46;line-height:1.8;margin:0 0 24px;">
+          I noticed you started the Coaching Business Quiz but didn't quite make it to the end.
+        </p>
+        <p style="font-size:16px;color:#3f3f46;line-height:1.8;margin:0 0 24px;">
+          Your strategic roadmap is only a few questions away. When you finish, you'll instantly unlock:
+        </p>
+        <ul style="font-size:15px;color:#3f3f46;line-height:1.8;margin:0 0 32px;padding-left:20px;">
+          <li>Your unique 2026 positioning score</li>
+          <li>A custom 90-day Action Plan overview</li>
+          <li>Your specific revenue-matching offer blueprint</li>
+        </ul>
+        
+        <div style="text-align:center;">
+            <a href="{quiz_url}" style="display:inline-block;background:#4f46e5;color:#ffffff;
+               font-size:16px;font-weight:bold;padding:18px 44px;border-radius:16px;
+               text-decoration:none;box-shadow:0 10px 20px rgba(79,70,229,0.2);">Finish My Assessment →</a>
+        </div>
+        
+        <p style="font-size:14px;color:#71717a;margin:32px 0 0;text-align:center;">
+            It should take less than 2 minutes to complete from where you left off.
+        </p>
+      </td></tr>
+      {_footer(unsubscribe_url)}
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>"""
