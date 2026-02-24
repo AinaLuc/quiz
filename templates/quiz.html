@@ -4,248 +4,445 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coaching Business Strategy Quiz</title>
+    <title>Coaching Business Strategy Assessment</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #fdfcfb 0%, #e2d1c3 100%);
+            min-height: 100vh;
         }
 
-        .form-card {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
         }
 
-        .input-focus {
-            outline: none;
+        .step {
+            display: none;
+        }
+
+        .step-active {
+            display: block;
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
             border-color: #6366f1;
-            ring: 2px;
-            ring-color: rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
     </style>
 </head>
 
-<body class="py-12 px-4 md:px-0">
-    <div class="max-w-3xl mx-auto">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-extrabold text-gray-900 mb-4">Coaching Strategy Assessment</h1>
-            <p class="text-xl text-gray-600">Complete the quiz and receive your personalized business plan snapshot by
-                email.</p>
+<body class="flex items-center justify-center py-10 px-4">
+    <div class="max-w-xl w-full">
+        <!-- HEADER / PROGRESS -->
+        <div class="mb-10 text-center">
+            <div class="inline-flex items-center space-x-2 bg-indigo-50 px-4 py-1.5 rounded-full mb-6">
+                <span id="step-indicator" class="text-xs font-bold text-indigo-600 uppercase tracking-widest">Question 1
+                    of 18</span>
+            </div>
+            <div class="progress-bar mb-2">
+                <div id="progress-fill" class="progress-fill" style="width: 5.5%"></div>
+            </div>
         </div>
 
-        <form action="/submit-quiz" method="POST" class="form-card p-8 space-y-8">
-            <!-- PERSONAL INFO -->
-            <div class="grid md:grid-cols-2 gap-6 pb-6 border-b border-gray-100">
-                <div>
-                    <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">First Name</label>
-                    <input type="text" id="name" name="name" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="Alex">
-                </div>
-                <div>
-                    <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-                    <input type="email" id="email" name="email" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="alex@example.com">
-                </div>
-            </div>
+        <!-- FORM CONTAINER -->
+        <form id="quiz-form" action="/submit-quiz" method="POST"
+            class="glass-panel rounded-3xl p-8 md:p-12 relative overflow-hidden">
 
-            <div class="space-y-8">
+            <div id="steps-container">
+                <!-- STEP 1: Name -->
+                <div class="step step-active">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Let's get started.</h2>
+                    <p class="text-gray-500 mb-8">What's your name, Coach?</p>
+                    <input type="text" name="name" required
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none transition"
+                        placeholder="First Name">
+                </div>
+
+                <!-- STEP 2: Email -->
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Almost there...</h2>
+                    <p class="text-gray-500 mb-8">Where should we send your results?</p>
+                    <input type="email" name="email" required
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none transition"
+                        placeholder="email@example.com">
+                </div>
+
+                <!-- Q1-Q16 -->
                 <!-- Q1 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">1. What's your primary area of
-                        expertise or experience?</label>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Expertise.</h2>
+                    <p class="text-gray-500 mb-8">What is your primary area of expertise or experience?</p>
                     <input type="text" name="Q1" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="e.g., Marketing, Fitness, Career transition">
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none transition"
+                        placeholder="e.g. Health, Business, Relationships">
                 </div>
 
                 <!-- Q2 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">2. What kind of advice do people
-                        naturally come to you for?</label>
-                    <textarea name="Q2" required rows="2"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="e.g., How to handle difficult conversations, how to organize my day..."></textarea>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Natural Gift.</h2>
+                    <p class="text-gray-500 mb-8">What kind of advice do people naturally come to you for?</p>
+                    <textarea name="Q2" required rows="3"
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none transition"
+                        placeholder="Describe the common themes..."></textarea>
                 </div>
 
                 <!-- Q3 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">3. How much coaching experience do you
-                        have?</label>
-                    <select name="Q3" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
-                        <option value="Beginner (just starting)">Beginner (just starting)</option>
-                        <option value="Intermediate (some clients)">Intermediate (some clients)</option>
-                        <option value="Advanced (established practice)">Advanced (established practice)</option>
-                    </select>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Journey.</h2>
+                    <p class="text-gray-500 mb-8">How much coaching experience do you have?</p>
+                    <div class="grid gap-4">
+                        <label
+                            class="px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl flex items-center cursor-pointer hover:border-indigo-400 transition">
+                            <input type="radio" name="Q3" value="Beginner (just starting)"
+                                class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 mr-4" checked>
+                            <span class="text-gray-700 font-semibold text-lg">Just starting</span>
+                        </label>
+                        <label
+                            class="px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl flex items-center cursor-pointer hover:border-indigo-400 transition">
+                            <input type="radio" name="Q3" value="Intermediate (some clients)"
+                                class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 mr-4">
+                            <span class="text-gray-700 font-semibold text-lg">Some clients</span>
+                        </label>
+                        <label
+                            class="px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl flex items-center cursor-pointer hover:border-indigo-400 transition">
+                            <input type="radio" name="Q3" value="Advanced (established practice)"
+                                class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 mr-4">
+                            <span class="text-gray-700 font-semibold text-lg">Established practice</span>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Q4 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">4. Who is your ideal client? (Be
-                        specific)</label>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Ideal Client.</h2>
+                    <p class="text-gray-500 mb-8">Describe the specific person you work with best.</p>
                     <input type="text" name="Q4" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="e.g., Introverted female entrepreneurs in their 30s">
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none transition"
+                        placeholder="e.g. Female entrepreneurs over 40">
                 </div>
 
                 <!-- Q5 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">5. What is their #1 problem? (In their
-                        exact words)</label>
-                    <textarea name="Q5" required rows="2"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="e.g., 'I feel like I'm working 24/7 but making no progress'"></textarea>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Pain Point.</h2>
+                    <p class="text-gray-500 mb-8">What is their #1 problem? (Use their exact words if you can)</p>
+                    <textarea name="Q5" required rows="3"
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none transition"
+                        placeholder="e.g. 'I feel stuck and don't know why'"></textarea>
                 </div>
 
                 <!-- Q6 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">6. What is the one thing they want
-                        more than anything else right now?</label>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Desire.</h2>
+                    <p class="text-gray-500 mb-8">What is the one thing they want most right now?</p>
                     <input type="text" name="Q6" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="e.g., More time with their family without feeling guilty">
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none transition"
+                        placeholder="Their ultimate goal...">
                 </div>
 
                 <!-- Q7 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">7. Who would you NOT work with? (Who
-                        is a bad fit?)</label>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Exclusion.</h2>
+                    <p class="text-gray-500 mb-8">Who is NOT a good fit for your coaching?</p>
                     <input type="text" name="Q7" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="e.g., People looking for a quick fix or guaranteed ROI in 2 weeks">
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none transition"
+                        placeholder="People who want a quick fix...">
                 </div>
 
                 <!-- Q8 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">8. How do you want to deliver your
-                        coaching?</label>
-                    <select name="Q8" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
-                        <option value="1-on-1 calls">1-on-1 calls</option>
-                        <option value="Group coaching">Group coaching</option>
-                        <option value="Course + Slack community">Course + Slack community</option>
-                        <option value="Hybrid (1-on-1 + Digital assets)">Hybrid (1-on-1 + Digital assets)</option>
-                    </select>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Delivery.</h2>
+                    <p class="text-gray-500 mb-8">How do you prefer to deliver your results?</p>
+                    <div class="grid gap-4">
+                        <select name="Q8"
+                            class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none appearance-none cursor-pointer">
+                            <option value="1-on-1 calls">1-on-1 calls</option>
+                            <option value="Group coaching">Group coaching</option>
+                            <option value="Hybrid (1-on-1 + Digital assets)">Hybrid (1-on-1 + Digital)</option>
+                            <option value="Course + Slack community">Course + Community</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Q9 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">9. What is the duration of your ideal
-                        program?</label>
-                    <select name="Q9" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
-                        <option value="4 weeks">4 weeks</option>
-                        <option value="8 weeks">8 weeks</option>
-                        <option value="12 weeks">12 weeks</option>
-                        <option value="6 months">6 months</option>
-                    </select>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Duration.</h2>
+                    <p class="text-gray-500 mb-8">What is your ideal program length?</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label
+                            class="px-4 py-3 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="radio" name="Q9" value="4 weeks" class="mr-2" checked> <span>4 Weeks</span>
+                        </label>
+                        <label
+                            class="px-4 py-3 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="radio" name="Q9" value="8 weeks" class="mr-2"> <span>8 Weeks</span>
+                        </label>
+                        <label
+                            class="px-4 py-3 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="radio" name="Q9" value="12 weeks" class="mr-2"> <span>12 Weeks</span>
+                        </label>
+                        <label
+                            class="px-4 py-3 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="radio" name="Q9" value="6 months" class="mr-2"> <span>6 Months</span>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Q10 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">10. What is your comfortable pricing
-                        range?</label>
-                    <select name="Q10" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Pricing.</h2>
+                    <p class="text-gray-500 mb-8">What is your target price point?</p>
+                    <select name="Q10"
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none appearance-none cursor-pointer">
                         <option value="$100 - $500">$100 - $500</option>
                         <option value="$500 - $2,000">$500 - $2,000</option>
-                        <option value="$2,000 - $5,000">$2,000 - $5,000</option>
+                        <option value="$2,000 - $5,000" selected>$2,000 - $5,000</option>
                         <option value="$5,000+">$5,000+</option>
                     </select>
                 </div>
 
                 <!-- Q11 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">11. What is your preferred content
-                        medium?</label>
-                    <select name="Q11" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
-                        <option value="Writing (Articles, newsletters)">Writing (Articles, newsletters)</option>
-                        <option value="Video (YouTube, Reels, TikTok)">Video (YouTube, Reels, TikTok)</option>
-                        <option value="Audio (Podcasting)">Audio (Podcasting)</option>
-                        <option value="Visual (Infographics, Carousels)">Visual (Infographics, Carousels)</option>
-                    </select>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Communication.</h2>
+                    <p class="text-gray-500 mb-8">What is your preferred content medium?</p>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex flex-col items-center text-center cursor-pointer hover:border-indigo-400">
+                            <input type="radio" name="Q11" value="Writing" class="mb-2" checked>
+                            <span>Writing (Newsletter)</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex flex-col items-center text-center cursor-pointer hover:border-indigo-400">
+                            <input type="radio" name="Q11" value="Video" class="mb-2">
+                            <span>Video (YouTube/TikTok)</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex flex-col items-center text-center cursor-pointer hover:border-indigo-400">
+                            <input type="radio" name="Q11" value="Audio" class="mb-2">
+                            <span>Audio (Podcast)</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex flex-col items-center text-center cursor-pointer hover:border-indigo-400">
+                            <input type="radio" name="Q11" value="Visual" class="mb-2">
+                            <span>Visual (Instagram)</span>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Q12 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">12. Current audience size (total
-                        followers/subscribers)?</label>
-                    <select name="Q12" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
-                        <option value="0 - 500">0 - 500</option>
-                        <option value="500 - 2,000">500 - 2,000</option>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Audience.</h2>
+                    <p class="text-gray-500 mb-8">What is your current total audience size?</p>
+                    <select name="Q12"
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none appearance-none cursor-pointer">
+                        <option value="0 - 500">Under 500</option>
+                        <option value="500 - 2,000" selected>500 - 2,000</option>
                         <option value="2,000 - 10,000">2,000 - 10,000</option>
                         <option value="10,000+">10,000+</option>
                     </select>
                 </div>
 
                 <!-- Q13 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">13. What is your biggest fear
-                        regarding starting this business?</label>
-                    <textarea name="Q13" required rows="2"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="e.g., That nobody will buy and I'll look foolish..."></textarea>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Resistance.</h2>
+                    <p class="text-gray-500 mb-8">What is your biggest fear regarding this business?</p>
+                    <textarea name="Q13" required rows="3"
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none transition"
+                        placeholder="e.g. That nobody will find value in my work..."></textarea>
                 </div>
 
                 <!-- Q14 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">14. How many hours a week can you
-                        realistically commit?</label>
-                    <select name="Q14" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
-                        <option value="0 - 5 hours">0 - 5 hours</option>
-                        <option value="5 - 15 hours">5 - 15 hours</option>
-                        <option value="15 - 30 hours">15 - 30 hours</option>
-                        <option value="Full-time">Full-time</option>
-                    </select>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Commitment.</h2>
+                    <p class="text-gray-500 mb-8">How many hours per week can you realistically commit?</p>
+                    <div class="grid gap-4">
+                        <select name="Q14"
+                            class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none appearance-none cursor-pointer">
+                            <option value="0 - 5 hours">0 - 5 hours</option>
+                            <option value="5 - 15 hours" selected>5 - 15 hours</option>
+                            <option value="15 - 30 hours">15 - 30 hours</option>
+                            <option value="Full-time">Full-time</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Q15 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">15. What is your monthly ad
-                        budget?</label>
-                    <select name="Q15" required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
-                        <option value="No budget right now">No budget right now</option>
-                        <option value="$100 - $500">$100 - $500</option>
-                        <option value="$500 - $2,000">$500 - $2,000</option>
-                        <option value="$2,000+">$2,000+</option>
-                    </select>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Ad Budget.</h2>
+                    <p class="text-gray-500 mb-8">What is your monthly ad budget (if any)?</p>
+                    <div class="grid gap-4 text-sm">
+                        <label
+                            class="px-4 py-3 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="radio" name="Q15" value="No budget right now" class="mr-2" checked> <span>No
+                                budget right now</span>
+                        </label>
+                        <label
+                            class="px-4 py-3 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="radio" name="Q15" value="$100 - $500" class="mr-2"> <span>$100 - $500</span>
+                        </label>
+                        <label
+                            class="px-4 py-3 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="radio" name="Q15" value="$500 - $2,000" class="mr-2"> <span>$500 -
+                                $2,000</span>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Q16 -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">16. What does success look like for
-                        you in 12 months?</label>
-                    <textarea name="Q16" required rows="2"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-                        placeholder="e.g., Earning $5k/mo and quit my job..."></textarea>
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Vision.</h2>
+                    <p class="text-gray-500 mb-8">What does success look like for you in 12 months?</p>
+                    <textarea name="Q16" required rows="3"
+                        class="w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none transition"
+                        placeholder="Describe your dream life..."></textarea>
+                </div>
+
+                <!-- FINAL STEP: Processing -->
+                <div class="step text-center py-6">
+                    <div
+                        class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-3xl">
+                        ✓</div>
+                    <h2 class="text-2xl font-extrabold text-gray-900 mb-2">Almost Ready!</h2>
+                    <p class="text-gray-500 mb-8 px-4">Click below to generate your complete coaching business plan
+                        snapshot.</p>
+                    <button type="submit"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 px-6 rounded-2xl text-xl shadow-lg transition-all hover:scale-[1.02]">
+                        Generate My Plan →
+                    </button>
+                    <p class="mt-4 text-xs text-gray-400">Processing takes about 20-30 seconds.</p>
                 </div>
             </div>
 
-            <div class="pt-8 pt-4">
-                <button type="submit"
-                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 px-6 rounded-xl transition duration-300 transform hover:scale-[1.02] shadow-xl text-xl">
-                    Generate My Coaching Business Plan →
+            <!-- BUTTONS -->
+            <div id="controls" class="flex items-center justify-between mt-12">
+                <button type="button" id="prev-btn"
+                    class="opacity-0 pointer-events-none text-gray-400 font-bold px-6 py-3 rounded-xl hover:text-gray-600 transition">
+                    ← Back
                 </button>
-                <p class="text-center text-xs text-gray-400 mt-4">
-                    By submitting, you agree to receive our 5-day strategy sequence. You can unsubscribe at any time.
-                </p>
+                <button type="button" id="next-btn"
+                    class="bg-gray-900 text-white font-bold px-10 py-4 rounded-2xl hover:bg-black transition shadow-md">
+                    Next
+                </button>
             </div>
+
         </form>
     </div>
 
-    <footer class="mt-20 text-center text-gray-400 text-sm">
-        <p>© 2024 Coaching Business Plan. Built for Coaches.</p>
-    </footer>
+    <!-- JS LOGIC -->
+    <script>
+        const form = document.getElementById('quiz-form');
+        const steps = Array.from(document.querySelectorAll('.step'));
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const progressFill = document.getElementById('progress-fill');
+        const stepIndicator = document.getElementById('step-indicator');
+        
+        let currentStep = 0;
+
+        function updateUI() {
+            // Show/Hide steps
+            steps.forEach((s, i) => {
+                s.classList.toggle('step-active', i === currentStep);
+                if (i !== currentStep) s.classList.remove('step-active');
+            });
+
+            // Update Indicator
+            stepIndicator.textContent = `Question ${currentStep + 1} of ${steps.length}`;
+            
+            // Progress Bar
+            const progress = ((currentStep + 1) / steps.length) * 100;
+            progressFill.style.width = `${progress}%`;
+
+            // Buttons visibility
+            prevBtn.style.opacity = currentStep === 0 ? '0' : '1';
+            prevBtn.style.pointerEvents = currentStep === 0 ? 'none' : 'auto';
+
+            // Special Case for final step
+            if (currentStep === steps.length - 1) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'block';
+                nextBtn.textContent = 'Next';
+            }
+        }
+
+        function validateCurrentStep() {
+            const currentInputs = steps[currentStep].querySelectorAll('input[required], textarea[required]');
+            let valid = true;
+            currentInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    input.classList.add('border-red-400');
+                    valid = false;
+                } else {
+                    input.classList.remove('border-red-400');
+                }
+            });
+            return valid;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (validateCurrentStep()) {
+                currentStep++;
+                updateUI();
+                // Focus first input in next step
+                const nextInput = steps[currentStep].querySelector('input, textarea, select');
+                if (nextInput) nextInput.focus();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 0) {
+                currentStep--;
+                updateUI();
+            }
+        });
+
+        // Initial UI
+        updateUI();
+
+        // Keyboard support (Enter to go to next)
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && currentStep < steps.length - 1) {
+                if (e.target.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    nextBtn.click();
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
