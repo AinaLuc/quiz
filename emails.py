@@ -206,7 +206,7 @@ def email_4_html(name: str, free_url: str, payment_url: str, unsubscribe_url: st
         <div style="text-align:center;">
             <a href="{payment_url}" style="display:inline-block;background:#4f46e5;color:#ffffff;
                font-size:16px;font-weight:bold;padding:18px 44px;border-radius:16px;
-               text-decoration:none;">Unlock My Full Plan — $49</a>
+               text-decoration:none;">Unlock My Full Plan — $150</a>
         </div>
       </td></tr>
       {_footer(unsubscribe_url)}
@@ -254,8 +254,9 @@ def email_5_html(name: str, free_url: str, payment_url: str, unsubscribe_url: st
         <div style="text-align:center;">
             <a href="{payment_url}" style="display:inline-block;background:#4f46e5;color:#ffffff;
                font-size:18px;font-weight:bold;padding:18px 48px;border-radius:18px;
-               text-decoration:none;box-shadow:0 10px 20px rgba(79,70,229,0.2);">Get My Full Plan for $49 →</a>
-            <p style="font-size:13px;color:#a1a1aa;margin:20px 0 0;">Instant download. 14-day clarity guarantee.</p>
+               text-decoration:none;box-shadow:0 10px 20px rgba(79,70,229,0.2);">Get My Full Plan for $150 →</a>
+            <p style="font-size:14px;color:#18181b;margin:20px 0 0;">Or upgrade to the <strong>$600 Video Review</strong> for personalized feedback.</p>
+            <p style="font-size:13px;color:#a1a1aa;margin:10px 0 0;">Instant download. 14-day clarity guarantee.</p>
         </div>
       </td></tr>
       {_footer(unsubscribe_url)}

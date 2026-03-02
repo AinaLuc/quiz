@@ -22,11 +22,14 @@ curl -X POST $URL \
   -d "Q8=Hybrid (1-on-1 + Digital assets)" \
   -d "Q9=12 weeks" \
   -d "Q10=$2,000 - $5,000" \
-  -d "Q11=Writing (Articles, newsletters)" \
   -d "Q12=500 - 2,000" \
   -d "Q13=That I won't be able to deliver enough value to justify the high price point." \
   -d "Q14=15 - 30 hours" \
+  -d "Q15_interest=Yes" \
   -d "Q15=\$500 - \$2,000" \
-  -d "Q16=Having a baseline of 5 active high-ticket clients and a repeatable system."
+  -d "Q16=Having a baseline of 5 active high-ticket clients and a repeatable system." \
+  -d "Q17=Referrals" \
+  -d "Q17=LinkedIn" \
+  -d "Q17_other=Workshops"
 
 echo -e "\n\n✅ Done! Check your app logs and your email inbox."

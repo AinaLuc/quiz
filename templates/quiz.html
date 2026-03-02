@@ -85,7 +85,7 @@
         <div class="mb-10 text-center">
             <div class="inline-flex items-center space-x-2 bg-indigo-50 px-4 py-1.5 rounded-full mb-6">
                 <span id="step-indicator" class="text-xs font-bold text-indigo-600 uppercase tracking-widest">Question 1
-                    of 19</span>
+                    of 20</span>
             </div>
             <div class="progress-bar mb-2">
                 <div id="progress-fill" class="progress-fill" style="width: 5.5%"></div>
@@ -265,39 +265,6 @@
                     </select>
                 </div>
 
-                <!-- Q11 -->
-                <div class="step">
-                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Communication.</h2>
-                    <p class="text-gray-500 mb-8">What is your preferred content medium?</p>
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <label
-                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex flex-col items-center text-center cursor-pointer hover:border-indigo-400">
-                            <input type="radio" name="Q11" value="Writing" class="mb-2" checked>
-                            <span>Writing (Newsletter)</span>
-                        </label>
-                        <label
-                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex flex-col items-center text-center cursor-pointer hover:border-indigo-400">
-                            <input type="radio" name="Q11" value="Video" class="mb-2">
-                            <span>Video (YouTube/TikTok)</span>
-                        </label>
-                        <label
-                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex flex-col items-center text-center cursor-pointer hover:border-indigo-400">
-                            <input type="radio" name="Q11" value="Audio" class="mb-2">
-                            <span>Audio (Podcast)</span>
-                        </label>
-                        <label
-                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex flex-col items-center text-center cursor-pointer hover:border-indigo-400">
-                            <input type="radio" name="Q11" value="Visual" class="mb-2">
-                            <span>Visual (Instagram)</span>
-                        </label>
-                        <label
-                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex flex-col items-center text-center cursor-pointer hover:border-indigo-400">
-                            <input type="radio" name="Q11" value="LinkedIn" class="mb-2">
-                            <span>Business (LinkedIn)</span>
-                        </label>
-                    </div>
-                </div>
-
                 <!-- Q12 -->
                 <div class="step">
                     <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Audience.</h2>
@@ -393,6 +360,67 @@
                         placeholder="Describe your dream life..."></textarea>
                 </div>
 
+                <!-- Q17 -->
+                <div class="step">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Channels Reality Check.</h2>
+                    <p class="text-gray-500 mb-6">Which channels are you currently using to get clients? (Select all)</p>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="checkbox" name="Q17" value="Referrals" class="mr-3">
+                            <span>Referrals</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="checkbox" name="Q17" value="Partnerships/Collaborations" class="mr-3">
+                            <span>Partnerships / Collaborations</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="checkbox" name="Q17" value="LinkedIn" class="mr-3">
+                            <span>LinkedIn</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="checkbox" name="Q17" value="Instagram" class="mr-3">
+                            <span>Instagram</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="checkbox" name="Q17" value="Email list" class="mr-3">
+                            <span>Email list</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="checkbox" name="Q17" value="Webinars" class="mr-3">
+                            <span>Webinars</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="checkbox" name="Q17" value="Speaking/Workshops" class="mr-3">
+                            <span>Speaking / Workshops</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="checkbox" name="Q17" value="Paid ads" class="mr-3">
+                            <span>Paid ads</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="checkbox" name="Q17" value="SEO/Blog" class="mr-3">
+                            <span>SEO / Blog</span>
+                        </label>
+                        <label
+                            class="p-4 bg-white/50 border border-gray-200 rounded-xl flex items-center cursor-pointer hover:border-indigo-400">
+                            <input type="checkbox" name="Q17" value="Communities/Groups" class="mr-3">
+                            <span>Communities / Groups</span>
+                        </label>
+                    </div>
+                    <input type="text" name="Q17_other"
+                        class="mt-5 w-full px-6 py-4 bg-white/50 border border-gray-200 rounded-2xl text-lg outline-none transition"
+                        placeholder="Other channel (optional)">
+                </div>
+
                 <!-- FINAL STEP: Processing -->
                 <div class="step text-center py-6">
                     <div
@@ -422,6 +450,14 @@
             </div>
 
         </form>
+
+        <!-- DEV TOOLS: Magic Fill -->
+        <div id="dev-tools" class="hidden mt-8 flex justify-center">
+            <button type="button" onclick="magicFill()"
+                class="bg-amber-100 text-amber-700 border border-amber-200 px-4 py-2 rounded-full text-xs font-bold hover:bg-amber-200 transition flex items-center shadow-sm">
+                <span class="mr-2">✨</span> Magic Fill & Jump to End
+            </button>
+        </div>
     </div>
 
     <!-- JS LOGIC -->
@@ -481,8 +517,8 @@
                 // If moving past Step 2 (Email), trigger tracking
                 if (currentStep === 1) trackStart();
 
-                // Skip Ad Budget if not interested (Step 17 is index 16)
-                if (currentStep === 16) {
+                // Skip Ad Budget if not interested (Q15_interest is index 15)
+                if (currentStep === 15) {
                     const interest = document.querySelector('input[name="Q15_interest"]:checked').value;
                     if (interest === 'No') {
                         currentStep += 2;
@@ -503,8 +539,8 @@
 
         prevBtn.addEventListener('click', () => {
             if (currentStep > 0) {
-                // Reverse skip logic
-                if (currentStep === 18) {
+                // Reverse skip logic (Q16 is index 17)
+                if (currentStep === 17) {
                     const interest = document.querySelector('input[name="Q15_interest"]:checked').value;
                     if (interest === 'No') {
                         currentStep -= 2;
@@ -575,6 +611,63 @@
                 }
             }
         });
+
+        // --- DEV TOOLS LOGIC ---
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('dev') === 'true') {
+            const devBox = document.getElementById('dev-tools');
+            if (devBox) devBox.classList.remove('hidden');
+        }
+
+        function magicFill() {
+            const data = {
+                'name': 'Luaina',
+                'email': 'luaina.mada@gmail.com',
+                'Q1': 'Business Operations & Efficiency',
+                'Q2': 'Optimizing workflows, reducing burnout, and scaling team communications.',
+                'Q3': 'Intermediate (some clients)',
+                'Q4': 'Founders of service-based businesses with 5-15 employees',
+                'Q5': 'I am working 80 hours a week and I am the bottleneck for everything. I can\'t step away.',
+                'Q6': 'To work only 20 hours a week on strategy while the business runs itself.',
+                'Q7': 'Solopreneurs who aren\'t ready to hire or delegate yet.',
+                'Q8': 'Hybrid (1-on-1 + Digital assets)',
+                'Q9': '12 weeks',
+                'Q10': '$2,000 - $5,000',
+                'Q12': '500 - 2,000',
+                'Q13': 'That giving up control will lead to the business failing or quality dropping.',
+                'Q14': '15 - 30 hours',
+                'Q15_interest': 'Yes',
+                'Q15': '$500 - $2,000',
+                'Q16': 'A business that generates $20k/mo profit without me needing to be in the day-to-day.',
+                'Q17': ['Referrals', 'Partnerships/Collaborations', 'LinkedIn'],
+            };
+
+            Object.keys(data).forEach(key => {
+                const elements = document.getElementsByName(key);
+                if (elements.length > 0) {
+                    const el = elements[0];
+                    if (el.type === 'radio') {
+                        const target = Array.from(elements).find(r => r.value === data[key]);
+                        if (target) target.checked = true;
+                    } else if (el.type === 'checkbox') {
+                        const values = Array.isArray(data[key]) ? data[key] : [data[key]];
+                        Array.from(elements).forEach(box => {
+                            if (values.includes(box.value)) box.checked = true;
+                        });
+                    } else if (el.tagName === 'SELECT' || el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        // PRESERVE Existing Name/Email if user already typed it
+                        if ((key === 'name' || key === 'email') && el.value.trim() !== "") {
+                            return;
+                        }
+                        el.value = data[key];
+                    }
+                }
+            });
+
+            // Jump to the last step (the submit step)
+            currentStep = steps.length - 1;
+            updateUI();
+        }
     </script>
 </body>
 
