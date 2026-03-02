@@ -1875,6 +1875,16 @@ def payment():
     return render_template('payment.html', key=key, file_id=file_id)
 
 
+@app.route('/debug-env')
+def debug_env():
+    # Return keys only (NO VALUES) for diagnostics
+    keys = list(os.environ.keys())
+    return jsonify({
+        "present": [k for k in keys if k in ["STRIPE_SECRET_KEY", "STRIPE_PUBLISHABLE_KEY", "OPENAI_API_KEY", "RESEND_API_KEY", "FROM_EMAIL"]],
+        "all_keys_count": len(keys)
+    })
+
+
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     # 1. Check for API key
