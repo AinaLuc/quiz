@@ -1877,10 +1877,16 @@ def payment():
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
+    # 1. Check for API key
+    if not stripe.api_key:
+        err_msg = "STRIPE_SECRET_KEY is not set in environment variables."
+        app.logger.error(f"CRITICAL: {err_msg}")
+        return jsonify(error=err_msg), 500 # Use 500 for configuration errors
+
     try:
         body = request.get_json(silent=True) or {}
         file_id = body.get('file_id', '')
-        tier = body.get('tier', 'standard') # 'standard' ($150) or 'premium' ($600)
+        tier = body.get('tier', 'standard')
         
         if tier == 'premium':
             price_amount = 60000
@@ -1889,6 +1895,7 @@ def create_checkout_session():
             price_amount = 15000
             product_name = 'Full Coaching Business Plan'
 
+        # 2. Create the session
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[
@@ -1909,9 +1916,12 @@ def create_checkout_session():
             metadata={'file_id': file_id, 'tier': tier},
         )
         return jsonify({'id': checkout_session.id})
+    except stripe.error.StripeError as e:
+        app.logger.error(f"Stripe Specific Error: {e.user_message or str(e)}")
+        return jsonify(error=f"Stripe error: {e.user_message or str(e)}"), 400
     except Exception as e:
-        app.logger.error(f"Stripe error: {e}")
-        return jsonify(error=str(e)), 403
+        app.logger.error(f"Unexpected error in create-checkout-session: {e}")
+        return jsonify(error="An unexpected internal error occurred."), 500
 
 
 @app.route('/success')
