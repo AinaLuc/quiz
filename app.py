@@ -81,72 +81,126 @@ def schedule_email_sequence(to_email: str, name: str, file_id: str, host_url: st
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PATH DETECTION — THREE PATHS
+# PATH DETECTION — FOUR PATHS
 #
-#  A  → Fully booked 1:1. Needs to scale beyond hours.
-#  B  → Still building. Needs offer, funnel, marketing.
-#  C  → Established 1:1 practitioner with UNTAPPED potential in corporate
-#        wellness, group programs, or speaking. Detected from quiz signals.
-#        Shows them the revenue ceiling THEY haven't seen yet and the exact
-#        adjacent channel that fits their niche.
+#  A → Has a group program, running paid ads to fill it, established coach.
+#      The cohort resets every cycle. The problem is a leaky acquisition
+#      engine and no continuity — NOT capacity. Fix: organic engine +
+#      alumni continuity + cohort waitlist system.
+#
+#  B → Still building. No group program, beginner or early-stage, low/mid
+#      pricing. Needs offer clarity, funnel, and first clients.
+#
+#  C → Established coach already doing corporate/B2B work (workshops,
+#      organisational clients, corporate wellness) but NOT on speaking
+#      stages yet. The next unlock is paid speaking and keynotes.
+#
+#  D → Established coach with premium somatic/wellness/performance niche,
+#      NOT in corporate yet. Has untapped organisational demand they
+#      haven't seen. Needs a corporate adoption strategy.
+#
+# DETECTION PHILOSOPHY — signal scoring, not rigid rules:
+#   - No single field gates a path. Signals are combined and weighted.
+#   - Duration is soft context, not a hard filter.
+#   - When signals are mixed, the strongest cluster wins.
+#   - Fallback is always B (never leave someone without a plan).
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _detect_path(answers: dict) -> str:
     """
-    Return 'A', 'B', or 'C'.
-
-    Path C fires when the coach is experienced (Advanced) AND the signals
-    suggest their 1:1 work is adjacent to corporate wellness, somatic
-    leadership, team dynamics, or speaking — but they haven't monetised it.
-
-    Signals for C:
-      • Q3 = Advanced / established practice
-      • Ideal client includes professionals, parents, teams, executives,
-        corporates, leaders, organisations, companies
-      • Niche keywords: nervous system, somatic, body, fascial, regulation,
-        resilience, burnout, stress, performance, leadership, wellbeing
-      • Pricing already ≥ $2 k (they're not cheap)
-      • They have NOT already crossed into corporate (no "corporate" in QA7)
+    Return 'A', 'B', 'C', or 'D' based on weighted quiz signals.
     """
-    fork = answers.get("QA_FORK", answers.get("QA_FORK", "")).lower()
-    if "fully booked" in fork or "path_a" in fork or fork == "a":
-        return "A"
+    # ── raw fields ──────────────────────────────────────────────────────────
+    fork         = (answers.get("QA_FORK") or "").lower()
+    experience   = (answers.get("Q3")  or answers.get("QA3_exp") or "").lower()
+    ideal_client = (answers.get("Q4")  or answers.get("QA4")     or "").lower()
+    niche        = (answers.get("Q1")  or answers.get("QA1")     or "").lower()
+    pain_point   = (answers.get("Q5")  or answers.get("QA5")     or "").lower()
+    pricing      = (answers.get("Q10") or answers.get("QA10")    or "").lower()
+    delivery     = (answers.get("Q8")  or answers.get("QA8")     or "").lower()
+    duration     = (answers.get("Q9")  or answers.get("QA9")     or "").lower()
+    channels     = (answers.get("Q17") or answers.get("QA7")     or "").lower()
+    hours        = (answers.get("Q14") or answers.get("QA13")    or "").lower()
+    paid_flag    = (answers.get("Q15_interest") or "").lower()
 
-    experience   = (answers.get("Q3") or answers.get("QA3_exp") or "").lower()
-    ideal_client = (answers.get("Q4") or answers.get("QA4") or "").lower()
-    niche        = (answers.get("Q1") or answers.get("QA1") or "").lower()
-    pain_point   = (answers.get("Q5") or answers.get("QA5") or "").lower()
-    pricing      = (answers.get("Q10") or answers.get("QA10") or "").lower()
-    channels     = (answers.get("Q17") or answers.get("QA7") or "").lower()
-    vision       = (answers.get("Q16") or answers.get("QA14") or "").lower()
-
+    # ── base signals ────────────────────────────────────────────────────────
     is_advanced = "advanced" in experience or "established" in experience
+    is_beginner = "beginner" in experience or "just start" in experience
 
-    corporate_client_keywords = [
-        "professional", "executive", "leader", "manager", "team", "corporate",
-        "organisation", "organization", "company", "companies", "parent", "family",
-        "families", "high-functioning", "high functioning", "performance"
-    ]
-    has_corporate_client = any(kw in ideal_client for kw in corporate_client_keywords)
+    # premium = pricing tier starts at $2k+; excludes "$500 - $2,000" (substring trap)
+    premium_pricing = any(p in pricing for p in
+        ["$2,000 - $5,000", "$5,000", "5,000+", "$2,000+", "2000 - 5000"])
 
-    somatic_keywords = [
-        "nervous system", "somatic", "body", "fascial", "fascia", "regulation",
-        "resilience", "burnout", "stress", "trauma", "performance", "leadership",
-        "wellbeing", "well-being", "mindfulness", "breath", "embodied", "inside-out",
-        "inside out", "self-override", "friction", "flow"
-    ]
-    has_somatic_niche = any(kw in niche + pain_point for kw in somatic_keywords)
+    # group delivery: explicitly group/cohort/course — NOT hybrid (hybrid = 1:1 + digital)
+    has_group_delivery = any(k in delivery for k in
+        ["group", "cohort", "course + "])
 
-    premium_pricing = any(p in pricing for p in ["2,000", "5,000", "5000", "2000", "$2", "$5"])
-
-    already_corporate = any(
-        kw in channels for kw in ["corporate", "speaking", "workshop", "b2b"]
+    uses_paid_ads = (
+        paid_flag == "yes" or
+        "paid ads" in channels or
+        "facebook" in channels or
+        "paid" in channels
     )
 
-    if (is_advanced and (has_corporate_client or has_somatic_niche)
-            and premium_pricing and not already_corporate):
+    # corporate/speaking already active in channels
+    already_speaking   = any(k in channels for k in
+        ["speaking", "keynote", "stage", "bureau"])
+    already_corporate  = any(k in channels for k in
+        ["corporate", "b2b", "organisations", "companies",
+         "workshop", "speaking/workshop"])
+
+    # somatic / wellness / performance niche
+    somatic_keywords = [
+        "nervous system", "somatic", "fascial", "fascia", "regulation",
+        "resilience", "burnout", "stress", "trauma", "performance",
+        "leadership", "wellbeing", "well-being", "mindfulness", "breath",
+        "embodied", "self-override", "friction", "flow", "body"
+    ]
+    has_somatic_niche = any(kw in niche + " " + pain_point
+                            for kw in somatic_keywords)
+
+    # corporate-adjacent ideal client
+    corp_client_keywords = [
+        "professional", "executive", "leader", "manager", "team", "corporate",
+        "organisation", "organization", "company", "companies", "parent",
+        "family", "families", "high-functioning", "high functioning",
+        "performance", "employee", "workforce", "staff"
+    ]
+    has_corporate_client = any(kw in ideal_client for kw in corp_client_keywords)
+
+    # hours maxed (soft signal that capacity is near limit)
+    hours_high = "30" in hours or "full" in hours.lower()
+
+    # ── PATH A — leaky group cohort coach ───────────────────────────────────
+    # Hard gates: must be advanced + running a group program + using paid ads
+    # Soft signals add confidence — duration is context, not a gate
+    a_soft = sum([
+        premium_pricing,                                       # charges real money
+        hours_high,                                            # near capacity
+        "4 week" in duration or "8 week" in duration,         # short cycle (soft)
+        not already_corporate,                                 # hasn't expanded yet
+    ])
+    if is_advanced and has_group_delivery and uses_paid_ads and a_soft >= 1:
+        return "A"
+
+    # ── PATH C — corporate-active, no speaking yet ──────────────────────────
+    # Core: already doing corporate/B2B work, speaking not yet monetised
+    if is_advanced and already_corporate and not already_speaking:
         return "C"
 
+    # ── PATH D — established somatic/premium, not in corporate yet ──────────
+    # Core: advanced + premium + niche maps to corporate demand + no corp yet
+    d_score = sum([
+        is_advanced,
+        premium_pricing,
+        has_somatic_niche or has_corporate_client,
+        not already_corporate,
+        not uses_paid_ads,          # not running ads = not in Path A territory
+    ])
+    if d_score >= 4:
+        return "D"
+
+    # ── PATH B — fallback (beginner / building) ─────────────────────────────
     return "B"
 
 
