@@ -357,7 +357,7 @@ def call_openai(answers: dict) -> dict:
     path = _detect_path(answers)
     if path == "A":
         return _call_openai_path_a(answers)
-    if path == "C":
+    if path in ("C", "D"):
         return _call_openai_path_c(answers)
     return _call_openai_path_b(answers)
 
@@ -2183,7 +2183,7 @@ def build_excel(data: dict, file_path: str):
     wb   = Workbook()
     path = data.get("coach_path", "B")
 
-    if path == "C":
+    if path in ("C", "D"):
         ws1 = wb.active; ws1.title = "🔍 Hidden Ceiling"
         build_c_diagnosis_sheet(ws1, data, is_free=False)
         wb.create_sheet("🚀 Expansion Offer");      build_c_offer_sheet(wb["🚀 Expansion Offer"], data, is_free=False)
@@ -2226,7 +2226,7 @@ def build_free_excel(data: dict, file_path: str, payment_url: str = ""):
     wb   = Workbook()
     path = data.get("coach_path", "B")
 
-    if path == "C":
+    if path in ("C", "D"):
         ws1 = wb.active; ws1.title = "🔍 Hidden Ceiling"
         build_c_diagnosis_sheet(ws1, data, is_free=True)
         wb.create_sheet("🚀 Expansion Offer");      build_c_offer_sheet(wb["🚀 Expansion Offer"], data, is_free=True)
