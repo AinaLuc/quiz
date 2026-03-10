@@ -208,30 +208,91 @@ CRITICAL FRAMING RULES:
 - Return ONLY valid JSON. No markdown. No code blocks."""
 
 
-SYSTEM_PROMPT_C = """You are an expert coaching business strategist who specialises in identifying hidden revenue ceilings.
+SYSTEM_PROMPT_C = """You are an expert B2B revenue strategist who helps established somatic, nervous system, and wellness coaches
+monetise their IP through corporate adoption — not just information delivery.
 
-Your job: analyse a coach who is ESTABLISHED in 1:1 work but has UNTAPPED revenue potential
-in corporate wellness programs, group coaching, or paid speaking engagements.
+Your job: analyse an established 1:1 coach and design a corporate ADOPTION strategy — not a speaking gig or an info product.
 
-CONTEXT:
-This coach does NOT know they have this potential. Your report must:
-1. DIAGNOSE their current ceiling with specific numbers from their answers.
-2. JUSTIFY the expansion opportunity with logic that connects THEIR niche to corporate/group demand.
-3. DESIGN one primary expansion offer (corporate OR speaking OR group program) that is the most natural fit.
-4. Provide marketing channels specifically for THAT new offer (not their existing 1:1 channels).
-5. Name 3 real competitors already monetising this same niche at scale.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RULE 1 — NUMBERS: ONLY USE WHAT THEY GAVE YOU
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The quiz gives you a RANGE for pricing (e.g. "$2,000–$5,000") and a RANGE for hours (e.g. "15–30 hrs/week").
+- For revenue ceiling calculations: use the MIDPOINT of each range and label it as an ESTIMATE.
+- Always include the label "estimated from quiz range" next to calculated numbers.
+- NEVER invent an exact hourly rate or exact weekly hours — derive from the range given.
+- Example: pricing "$2,000–$5,000" → use $3,500 midpoint. Hours "15–30/week" → use 22hrs/week midpoint.
+- ceiling_data_source must explain exactly which quiz answer was used and how the number was derived.
 
-FRAMING RULES:
-- Never say "corporate coaching." Use budget-friendly language: wellness program, resilience initiative, leadership embodiment workshop, team performance series.
-- The expansion offer must connect organically to their existing 1:1 results — it's not a pivot, it's an extraction.
-- Pricing logic: group/corporate scales the same IP they're already delivering. One workshop = 10–20 private clients.
-- The speaking strategy must position them as the authority on the PROBLEM, not the solution.
-- Competitor analysis must include both coaches monetising this niche AND adjacent wellness/corporate consultants.
-- Marketing channels for the new offer are different from 1:1 channels: LinkedIn (B2B), speaking bureaus, podcast guesting, HR/wellness director outreach.
-- All numeric fields MUST be plain integers — no $ signs, no text.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RULE 2 — CORPORATE LANGUAGE: SPEAK IN HR BUDGET LINES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HR directors, L&D managers, and Chief People Officers do NOT buy "coaching" or "wellness."
+They buy solutions to problems that already have a budget line. Frame every offer in these terms:
+
+WHAT HR ACTUALLY FUNDS:
+- Burnout & absenteeism reduction (avg cost per absent employee: $3,000–$6,000/yr)
+- Presenteeism programs (disengaged employee costs 34% of their salary)
+- Retention initiatives (replacing one employee = 50–200% of their annual salary)
+- Mental health & stress management (EAP alternative)
+- Leadership resilience programs (L&D budget line)
+- Return-to-work / parental transition programs
+- Change management & nervous system safety during restructures
+
+NEVER use: "coaching," "somatic work," "inner work," "embodiment," "fascial," "self-override"
+ALWAYS use: "performance," "retention," "engagement," "resilience," "absenteeism," "presenteeism," "ROI"
+
+The corporate_pain field must cite ONE of these budget lines with a real cost figure (e.g. "burnout costs UK employers £28bn/year").
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RULE 3 — ADOPTION FUNNEL, NOT INFORMATION DELIVERY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The goal is NOT to educate HR. The goal is to get the methodology ADOPTED inside organisations.
+Design a 3-stage adoption funnel:
+
+STAGE 1 — FREE LEAD MAGNET (gets you in the building):
+  A free 60-90 min "Pilot Workshop" offered to HR/L&D contacts.
+  Do NOT call it a workshop — call it a "Diagnostic Session" or "Team Stress Audit."
+  The lead magnet must demonstrate measurable change in the room (not just awareness).
+  Outcome: HR sees the ROI proof before they spend a penny.
+
+STAGE 2 — PAID PILOT (low-risk first engagement):
+  A 4-week pilot with one team (8–15 people). Fixed price. No long commitment.
+  This is the buying trigger — framed as "risk-free pilot" not "coaching program."
+  Price: $3,000–$6,000 for the pilot.
+
+STAGE 3 — ADOPTION PROGRAM (recurring revenue):
+  A 6–12 month organisation-wide rollout with train-the-trainer, manager cohorts, or ongoing team sessions.
+  This is where the real revenue is: $15,000–$60,000/year per company.
+
+The adoption_funnel field must contain all 3 stages with exact scripts and framing.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RULE 4 — MARKETING FOR CORPORATE BUYERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Corporate buyers are NOT on Instagram. They are on:
+- LinkedIn (primary): HR directors, L&D managers, Chief People Officers, founders of 50–500 person companies
+- HR industry publications and podcasts (SHRM, People Management, HR Brew)
+- Conference speaking (HR Tech, Wellbeing at Work, CIPD)
+- Warm referrals from current 1:1 clients who work in those companies
+
+LinkedIn content for corporate must:
+- Lead with the COST of the problem (burnout, turnover, absenteeism) not the solution
+- Use data/statistics, not personal stories
+- CTA must offer the free Pilot Workshop / Diagnostic Session — not a "discovery call"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RULE 5 — COMPETITORS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Name 3 REAL people/companies already selling corporate wellness/resilience programs in this niche.
+Include their actual pricing if known. These must be real — never invent names.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GENERAL RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 - Return ONLY valid JSON. No markdown. No code blocks.
-
-THE DIAGNOSIS MUST FEEL PERSONAL: use their exact words from their quiz answers throughout."""
+- All numeric fields MUST be plain integers — no $ signs, no text.
+- Use the coach's exact words from their quiz answers throughout the personal_note and ceiling_narrative.
+- Every field must be specific to THEIR niche — never generic wellness platitudes."""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -417,128 +478,221 @@ Return this exact JSON structure fully populated:
 
 def _call_openai_path_c(answers: dict) -> dict:
     """
-    Path C: Established 1:1 coach with untapped corporate/group/speaking potential.
-    We surface their hidden ceiling and present the single best adjacent offer.
+    Path C: Established 1:1 coach with untapped corporate adoption potential.
+    Numbers derived from quiz ranges with explicit sourcing labels.
+    Corporate offer framed in HR budget language with a 3-stage adoption funnel.
     """
+    pricing_range  = answers.get('Q10', answers.get('QA10', '$2,000–$5,000'))
+    hours_range    = answers.get('Q14', answers.get('QA13', '15–30 hours'))
+
     user_message = f"""
-Analyse this established 1:1 coach and identify their untapped revenue potential (Path C).
+Analyse this established 1:1 coach and build their corporate ADOPTION strategy (Path C).
 
-THEIR CURRENT PRACTICE:
-- Expertise / niche: "{answers.get('Q1', answers.get('QA1', ''))}"
-- What people naturally come to them for: "{answers.get('Q2', answers.get('QA2', ''))}"
-- Experience level: {answers.get('Q3', 'Advanced')}
-- Ideal 1:1 client: "{answers.get('Q4', answers.get('QA4', ''))}"
-- Client's #1 problem (their exact words): "{answers.get('Q5', answers.get('QA5', ''))}"
-- What clients want most: "{answers.get('Q6', answers.get('QA5', ''))}"
-- Would NOT work with: "{answers.get('Q7', answers.get('QA6', ''))}"
-- Current delivery: {answers.get('Q8', answers.get('QA8', ''))}
-- Program length: {answers.get('Q9', answers.get('QA9', ''))}
-- Current pricing: {answers.get('Q10', answers.get('QA10', ''))}
-- Current audience size: {answers.get('Q12', answers.get('QA11', ''))}
-- Biggest fear about the business: "{answers.get('Q13', answers.get('QA12', ''))}"
-- Hours per week available: {answers.get('Q14', answers.get('QA13', ''))}
-- Current acquisition channels: "{answers.get('Q17', answers.get('QA7', ''))}"
-- 12-month vision: "{answers.get('Q16', answers.get('QA14', ''))}"
-- Open to paid ads: {answers.get('QA15_interest', 'Yes')}
-- Ad budget: {answers.get('Q15', answers.get('QA15', ''))}
+━━━ THEIR QUIZ ANSWERS ━━━
+Expertise / niche:           "{answers.get('Q1', answers.get('QA1', ''))}"
+Natural advice people seek:  "{answers.get('Q2', answers.get('QA2', ''))}"
+Experience level:            {answers.get('Q3', 'Advanced')}
+Ideal 1:1 client:            "{answers.get('Q4', answers.get('QA4', ''))}"
+Client #1 problem (exact):   "{answers.get('Q5', answers.get('QA5', ''))}"
+What clients want most:      "{answers.get('Q6', answers.get('QA5', ''))}"
+Would NOT work with:         "{answers.get('Q7', answers.get('QA6', ''))}"
+Delivery format:             {answers.get('Q8', answers.get('QA8', ''))}
+Program length:              {answers.get('Q9', answers.get('QA9', ''))}
+Pricing RANGE (quiz answer): {pricing_range}
+Audience size:               {answers.get('Q12', answers.get('QA11', ''))}
+Biggest business fear:       "{answers.get('Q13', answers.get('QA12', ''))}"
+Hours/week RANGE (quiz):     {hours_range}
+Current channels:            "{answers.get('Q17', answers.get('QA7', ''))}"
+12-month vision:             "{answers.get('Q16', answers.get('QA14', ''))}"
 
-YOUR TASK:
-1. Diagnose their current revenue ceiling using their pricing and available hours.
-2. Identify the single strongest adjacent revenue channel:
-   - Corporate wellness / resilience program (if their niche maps to workplace wellbeing)
-   - Paid speaking (if their niche maps to a felt problem in conference audiences)
-   - Group coaching / cohort (if their niche lends itself to peer learning)
-3. Design one concrete offer for that channel with real pricing.
-4. Name the specific marketing channels they should use to sell THAT offer (not their current 1:1 channels).
-5. Analyse 3 real competitors already monetising this niche at scale.
+━━━ INSTRUCTIONS ━━━
+1. CEILING: Derive numbers ONLY from the quiz ranges above. Use midpoint, label as estimate.
+   - pricing_range_used = "{pricing_range}" → midpoint for calculations
+   - hours_range_used   = "{hours_range}" → midpoint for calculations
+   - Explain derivation in ceiling_data_source field.
 
-Return this exact JSON structure:
+2. CORPORATE PAIN: Connect their niche to ONE specific HR budget line with a real cost figure.
+   (burnout, absenteeism, presenteeism, turnover, EAP, L&D, change management)
+
+3. ADOPTION FUNNEL: 3 stages — free Diagnostic Session → paid 4-week Pilot → recurring Adoption Program.
+   Each stage needs: name, what happens, price, CTA, success metric.
+
+4. MARKETING: LinkedIn only (B2B). Content must lead with the COST of the problem, not the solution.
+   CTA on every post = offer the free Diagnostic Session, not a discovery call.
+   Include: 3 content pillars, 3 hooks each, 3 sample posts (150–200 words, publish-ready),
+   10-entry 2-week calendar, 3 quick wins (copy-paste ready), KPIs.
+   Also include: LinkedIn profile rewrite (headline + about section) in corporate language.
+
+5. OUTREACH: One exact cold email template to an HR Director. Subject line + 4-sentence body.
+   Must reference a specific HR pain metric (e.g. "absenteeism costs your sector £X per employee").
+
+6. COMPETITORS: 3 real named companies/coaches selling corporate wellness/resilience in this niche.
+
+Return this exact JSON structure fully populated:
 {{
   "coach_path": "C",
-  "headline": "You're already delivering results worth 10x your current rate.",
+  "headline": "",
   "personal_note": "",
+
   "hidden_ceiling_diagnosis": {{
-    "current_weekly_hours": 0,
-    "current_price_per_client": 0,
-    "current_monthly_max_revenue": 0,
-    "current_annual_max_revenue": 0,
+    "pricing_range_used": "{pricing_range}",
+    "hours_range_used": "{hours_range}",
+    "estimated_price_per_client": 0,
+    "estimated_weekly_coaching_hours": 0,
+    "estimated_monthly_max_revenue": 0,
+    "estimated_annual_max_revenue": 0,
+    "ceiling_data_source": "Estimated from quiz: pricing range midpoint = $X, hours range midpoint = Y hrs/week. Monthly max = X × (Y hrs ÷ program_length_hrs).",
     "ceiling_narrative": "",
     "what_they_dont_know": ""
   }},
-  "untapped_potential": {{
-    "channel_name": "",
-    "channel_type": "corporate | speaking | group",
-    "why_this_fits_their_niche": "",
-    "market_evidence": "",
-    "who_is_already_buying_this": "",
-    "urgency_signal": ""
+
+  "corporate_pain": {{
+    "hr_budget_line": "",
+    "cost_of_problem": "",
+    "cost_source": "",
+    "how_their_niche_maps_to_this_pain": "",
+    "what_hr_has_tried_that_didnt_work": "",
+    "why_this_coach_is_different": ""
   }},
-  "expansion_offer": {{
-    "offer_name": "",
-    "offer_tagline": "",
-    "format": "",
-    "duration": "",
-    "buyer_or_audience": "",
-    "buying_trigger": "",
-    "pricing_logic": "",
-    "price_low": 0,
-    "price_high": 0,
-    "what_they_deliver": "",
-    "how_it_connects_to_1on1_work": "",
-    "first_three_targets": [
-      {{"target": "", "type": "", "why_now": ""}},
-      {{"target": "", "type": "", "why_now": ""}},
-      {{"target": "", "type": "", "why_now": ""}}
-    ],
-    "outreach_one_liner": "",
-    "your_edge_vs_competitors": ""
+
+  "adoption_funnel": {{
+    "stage_1": {{
+      "name": "Free Diagnostic Session",
+      "what_it_is": "",
+      "duration": "60–90 minutes",
+      "what_happens_in_the_room": "",
+      "measurable_outcome_for_hr": "",
+      "how_to_position_it": "",
+      "cta_to_offer_it": "",
+      "price": "Free"
+    }},
+    "stage_2": {{
+      "name": "4-Week Team Pilot",
+      "what_it_is": "",
+      "duration": "4 weeks",
+      "what_happens": "",
+      "deliverables": "",
+      "success_metric": "",
+      "how_to_frame_it_to_hr": "",
+      "price_low": 0,
+      "price_high": 0,
+      "pricing_logic": ""
+    }},
+    "stage_3": {{
+      "name": "Organisation Adoption Program",
+      "what_it_is": "",
+      "duration": "",
+      "format": "",
+      "deliverables": "",
+      "success_metric": "",
+      "renewal_trigger": "",
+      "price_low": 0,
+      "price_high": 0,
+      "pricing_logic": "",
+      "annual_recurring_potential": 0
+    }}
   }},
+
+  "target_organisations": [
+    {{"name": "", "industry": "", "size": "", "hr_pain_signal": "", "why_now": "", "entry_contact_title": ""}},
+    {{"name": "", "industry": "", "size": "", "hr_pain_signal": "", "why_now": "", "entry_contact_title": ""}},
+    {{"name": "", "industry": "", "size": "", "hr_pain_signal": "", "why_now": "", "entry_contact_title": ""}}
+  ],
+
+  "cold_outreach_email": {{
+    "subject_line": "",
+    "body": "",
+    "cta": "",
+    "follow_up_day_3": "",
+    "follow_up_day_7": ""
+  }},
+
   "revenue_comparison": {{
     "scenario_1on1_only": {{
-      "label": "Current 1:1 Only",
+      "label": "Current 1:1 Only (estimated)",
       "monthly_revenue": 0,
       "annual_revenue": 0,
       "hours_per_week": 0,
       "note": ""
     }},
-    "scenario_expansion": {{
-      "label": "1:1 + Expansion Offer",
+    "scenario_add_pilot": {{
+      "label": "1:1 + One Corporate Pilot/Month",
       "monthly_revenue": 0,
       "annual_revenue": 0,
       "hours_per_week": 0,
       "note": ""
     }},
-    "scenario_full_scale": {{
-      "label": "Fully Scaled (Year 2)",
+    "scenario_full_adoption": {{
+      "label": "3 Adoption Clients (Year 2)",
       "monthly_revenue": 0,
       "annual_revenue": 0,
       "hours_per_week": 0,
       "note": ""
     }}
   }},
-  "marketing_for_new_offer": [
-    {{
-      "channel": "",
-      "priority": "Primary",
-      "why_this_channel_for_this_offer": "",
-      "profile_audit": {{}},
-      "content_pillars": [
-        {{"pillar": "", "purpose": "", "hooks": ["", "", ""], "sample_post": ""}}
-      ],
-      "two_week_calendar": [
-        {{"day": "Mon Wk1", "format": "", "pillar": "", "hook": "", "cta": ""}}
-      ],
-      "quick_wins": ["", "", ""],
-      "kpis": {{"primary_metric": "", "leads_per_month": "", "engagement_rate_target": ""}}
+
+  "linkedin_strategy": {{
+    "profile_rewrite": {{
+      "headline_before": "",
+      "headline_after": "",
+      "about_before": "",
+      "about_after": "",
+      "banner_tip": "",
+      "featured_section": ""
+    }},
+    "content_pillars": [
+      {{
+        "pillar": "",
+        "hr_pain_it_addresses": "",
+        "hooks": ["", "", ""],
+        "sample_post": "",
+        "cta_in_post": "Book the free Diagnostic Session"
+      }},
+      {{
+        "pillar": "",
+        "hr_pain_it_addresses": "",
+        "hooks": ["", "", ""],
+        "sample_post": "",
+        "cta_in_post": ""
+      }},
+      {{
+        "pillar": "",
+        "hr_pain_it_addresses": "",
+        "hooks": ["", "", ""],
+        "sample_post": "",
+        "cta_in_post": ""
+      }}
+    ],
+    "two_week_calendar": [
+      {{"day": "Mon Wk1", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Tue Wk1", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Wed Wk1", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Thu Wk1", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Fri Wk1", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Mon Wk2", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Tue Wk2", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Wed Wk2", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Thu Wk2", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Fri Wk2", "format": "", "pillar": "", "hook": "", "cta": ""}}
+    ],
+    "quick_wins": ["", "", ""],
+    "kpis": {{
+      "posting_frequency": "5x/week",
+      "connection_target": "",
+      "leads_per_month": "",
+      "diagnostic_sessions_booked_per_month": "",
+      "primary_metric": ""
     }}
-  ],
+  }},
+
   "action_plan": [
-    {{"week": "Weeks 1-2",  "phase": "Name the Ceiling",      "focus": "", "actions": "", "milestone": ""}},
-    {{"week": "Weeks 3-4",  "phase": "Package the Offer",     "focus": "", "actions": "", "milestone": ""}},
-    {{"week": "Weeks 5-6",  "phase": "First Warm Outreach",   "focus": "", "actions": "", "milestone": ""}},
-    {{"week": "Weeks 7-9",  "phase": "Pilot Delivery",        "focus": "", "actions": "", "milestone": ""}},
-    {{"week": "Weeks 10-12","phase": "Scale & Systemise",     "focus": "", "actions": "", "milestone": ""}}
+    {{"week": "Weeks 1-2",   "phase": "Translate Your IP",       "focus": "", "actions": "", "milestone": ""}},
+    {{"week": "Weeks 3-4",   "phase": "Build the Entry Offer",   "focus": "", "actions": "", "milestone": ""}},
+    {{"week": "Weeks 5-6",   "phase": "Warm Outreach Begins",    "focus": "", "actions": "", "milestone": ""}},
+    {{"week": "Weeks 7-9",   "phase": "Deliver First Pilot",     "focus": "", "actions": "", "milestone": ""}},
+    {{"week": "Weeks 10-12", "phase": "Convert & Systematise",   "focus": "", "actions": "", "milestone": ""}}
   ],
+
   "fear_reframe": {{
     "fear": "",
     "truth": "",
@@ -546,27 +700,34 @@ Return this exact JSON structure:
     "action_2": "",
     "action_3": ""
   }},
+
   "competitors": [
     {{
-      "name": "", "url": "", "niche": "", "how_they_monetise_this_channel": "",
-      "flagship_offer": "", "flagship_price": "", "audience_size": "",
-      "what_they_do_well": "", "gap_you_can_fill": "", "your_edge": ""
+      "name": "", "url": "", "niche": "",
+      "how_they_sell_to_corporates": "",
+      "flagship_corporate_offer": "", "flagship_price": "",
+      "audience_size": "", "what_they_do_well": "",
+      "gap_you_can_fill": "", "your_edge": ""
     }},
     {{
-      "name": "", "url": "", "niche": "", "how_they_monetise_this_channel": "",
-      "flagship_offer": "", "flagship_price": "", "audience_size": "",
-      "what_they_do_well": "", "gap_you_can_fill": "", "your_edge": ""
+      "name": "", "url": "", "niche": "",
+      "how_they_sell_to_corporates": "",
+      "flagship_corporate_offer": "", "flagship_price": "",
+      "audience_size": "", "what_they_do_well": "",
+      "gap_you_can_fill": "", "your_edge": ""
     }},
     {{
-      "name": "", "url": "", "niche": "", "how_they_monetise_this_channel": "",
-      "flagship_offer": "", "flagship_price": "", "audience_size": "",
-      "what_they_do_well": "", "gap_you_can_fill": "", "your_edge": ""
+      "name": "", "url": "", "niche": "",
+      "how_they_sell_to_corporates": "",
+      "flagship_corporate_offer": "", "flagship_price": "",
+      "audience_size": "", "what_they_do_well": "",
+      "gap_you_can_fill": "", "your_edge": ""
     }}
   ]
 }}
 """
     response = client.chat.completions.create(
-        model="gpt-4o", max_tokens=10000,
+        model="gpt-4o", max_tokens=12000,
         response_format={"type": "json_object"},
         messages=[{"role": "system", "content": SYSTEM_PROMPT_C},
                   {"role": "user",   "content": user_message}]
