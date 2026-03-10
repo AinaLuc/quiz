@@ -790,9 +790,9 @@ def _lock(ws, row, col, val="", align="left"):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def build_c_diagnosis_sheet(ws, data, is_free=False):
-    """Sheet 1: Hidden ceiling diagnosis — fully visible to hook them."""
+    """Sheet 1: Hidden ceiling + corporate pain — the hook."""
     diag = data.get("hidden_ceiling_diagnosis", {})
-    unt  = data.get("untapped_potential", {})
+    corp = data.get("corporate_pain", {})
 
     section_header(ws, 1, "🔍  YOUR HIDDEN REVENUE CEILING — DIAGNOSED", span=2, bg=C_DARK)
     ws.merge_cells("A2:B2")
@@ -800,13 +800,17 @@ def build_c_diagnosis_sheet(ws, data, is_free=False):
        color=C_DARK, bg=C_LIGHT, size=13, align="center")
     rh(ws, 2, 32)
 
+    # note: keys now use estimated_ prefix from new schema
     diag_rows = [
-        ("CURRENT HOURS/WEEK (COACHING)", diag.get("current_weekly_hours", 0),     False, False),
-        ("CURRENT PRICE PER CLIENT",      diag.get("current_price_per_client", 0), False, True),
-        ("MONTHLY REVENUE CEILING",       diag.get("current_monthly_max_revenue", 0), False, True),
-        ("ANNUAL REVENUE CEILING",        diag.get("current_annual_max_revenue", 0), False, True),
-        ("WHY THIS IS A CEILING",         diag.get("ceiling_narrative", ""),        False, False),
-        ("WHAT YOU DON'T KNOW YET",       diag.get("what_they_dont_know", ""),      is_free, False),
+        ("PRICING RANGE (FROM QUIZ)",    diag.get("pricing_range_used", ""),                   False, False),
+        ("HOURS/WEEK RANGE (FROM QUIZ)", diag.get("hours_range_used", ""),                      False, False),
+        ("EST. PRICE PER CLIENT",        diag.get("estimated_price_per_client", 0),             False, True),
+        ("EST. WEEKLY COACHING HOURS",   diag.get("estimated_weekly_coaching_hours", 0),        False, False),
+        ("EST. MONTHLY REVENUE CEILING", diag.get("estimated_monthly_max_revenue", 0),          False, True),
+        ("EST. ANNUAL REVENUE CEILING",  diag.get("estimated_annual_max_revenue", 0),           False, True),
+        ("HOW THESE WERE CALCULATED",    diag.get("ceiling_data_source", ""),                   False, False),
+        ("WHY THIS IS A CEILING",        diag.get("ceiling_narrative", ""),                     False, False),
+        ("WHAT YOU DON'T KNOW YET",      diag.get("what_they_dont_know", ""),                   is_free, False),
     ]
     for ri, (label, val, locked, is_money) in enumerate(diag_rows, 4):
         cl(ws, ri, 1, label, bold=True, bg="FDE68A", color=C_DARK, size=11)
@@ -817,90 +821,154 @@ def build_c_diagnosis_sheet(ws, data, is_free=False):
             if is_money and isinstance(val, int): money_fmt(c)
         rh(ws, ri, 52)
 
-    gap_row = 11
-    section_header(ws, gap_row, "💡  UNTAPPED POTENTIAL DETECTED", span=2, bg=C_MID)
-    unt_rows = [
-        ("EXPANSION CHANNEL",   unt.get("channel_name", ""),             False),
-        ("WHY IT FITS YOUR NICHE", unt.get("why_this_fits_their_niche", ""), False),
-        ("MARKET EVIDENCE",     unt.get("market_evidence", ""),           is_free),
-        ("WHO IS ALREADY BUYING THIS", unt.get("who_is_already_buying_this", ""), is_free),
-        ("URGENCY SIGNAL",      unt.get("urgency_signal", ""),            is_free),
+    gap_row = 4 + len(diag_rows) + 1
+    section_header(ws, gap_row, "🏢  THE CORPORATE PAIN YOUR NICHE SOLVES", span=2, bg=C_MID)
+    corp_rows = [
+        ("HR BUDGET LINE",                corp.get("hr_budget_line", ""),               False),
+        ("COST OF THE PROBLEM",           corp.get("cost_of_problem", ""),              False),
+        ("SOURCE",                        corp.get("cost_source", ""),                  False),
+        ("HOW YOUR NICHE MAPS TO IT",     corp.get("how_their_niche_maps_to_this_pain",""), False),
+        ("WHAT HR HAS TRIED THAT FAILED", corp.get("what_hr_has_tried_that_didnt_work",""), is_free),
+        ("WHY YOU'RE DIFFERENT",          corp.get("why_this_coach_is_different",""),   is_free),
     ]
-    for ri, (label, val, locked) in enumerate(unt_rows, gap_row + 2):
+    for ri, (label, val, locked) in enumerate(corp_rows, gap_row + 2):
         cl(ws, ri, 1, label, bold=True, bg="FDE68A", color=C_DARK, size=10)
         if locked:
             _lock(ws, ri, 2, _tease(val, keep=60))
         else:
             cl(ws, ri, 2, val, bg=C_ACCENT, size=10)
-        rh(ws, ri, 50)
+        rh(ws, ri, 55)
 
-    cw(ws, 1, 34); cw(ws, 2, 72)
+    cw(ws, 1, 36); cw(ws, 2, 72)
 
 
 def build_c_offer_sheet(ws, data, is_free=False):
-    """Sheet 2: The expansion offer design."""
-    offer = data.get("expansion_offer", {})
-    section_header(ws, 1, "🚀  YOUR EXPANSION OFFER — DESIGNED", span=2, bg=C_DARK)
+    """Sheet 2: The 3-stage corporate adoption funnel."""
+    funnel = data.get("adoption_funnel", {})
+    s1 = funnel.get("stage_1", {})
+    s2 = funnel.get("stage_2", {})
+    s3 = funnel.get("stage_3", {})
+    outreach = data.get("cold_outreach_email", {})
 
-    meta_rows = [
-        ("OFFER NAME",               offer.get("offer_name", ""),             False),
-        ("TAGLINE",                  offer.get("offer_tagline", ""),           False),
-        ("FORMAT",                   offer.get("format", ""),                  False),
-        ("DURATION",                 offer.get("duration", ""),                False),
-        ("BUYER / AUDIENCE",         offer.get("buyer_or_audience", ""),       is_free),
-        ("BUYING TRIGGER",           offer.get("buying_trigger", ""),          is_free),
-        ("PRICING LOGIC",            offer.get("pricing_logic", ""),           is_free),
-        ("PRICE RANGE",              f"${offer.get('price_low',0):,} – ${offer.get('price_high',0):,}", is_free),
-        ("WHAT YOU DELIVER",         offer.get("what_they_deliver", ""),       False),
-        ("HOW IT CONNECTS TO 1:1",   offer.get("how_it_connects_to_1on1_work", ""), False),
-        ("OUTREACH ONE-LINER",       offer.get("outreach_one_liner", ""),      is_free),
-        ("YOUR EDGE VS COMPETITORS", offer.get("your_edge_vs_competitors", ""), is_free),
+    section_header(ws, 1, "🚀  YOUR 3-STAGE CORPORATE ADOPTION FUNNEL", span=2, bg=C_DARK)
+
+    # Stage 1 — Free Lead Magnet
+    row = 3
+    section_header(ws, row, f"STAGE 1 (FREE) — {s1.get('name','Free Diagnostic Session')}", span=2, bg=C_MID)
+    row += 1
+    stage1_rows = [
+        ("WHAT IT IS",                s1.get("what_it_is",""),              False),
+        ("DURATION",                  s1.get("duration","60–90 minutes"),   False),
+        ("WHAT HAPPENS IN THE ROOM",  s1.get("what_happens_in_the_room",""), False),
+        ("MEASURABLE OUTCOME FOR HR", s1.get("measurable_outcome_for_hr",""), False),
+        ("HOW TO POSITION IT",        s1.get("how_to_position_it",""),      False),
+        ("CTA TO OFFER IT",           s1.get("cta_to_offer_it",""),         is_free),
+        ("PRICE",                     "Free",                               False),
     ]
-    for ri, (label, val, locked) in enumerate(meta_rows, 3):
-        cl(ws, ri, 1, label, bold=True, bg="FDE68A", color=C_DARK)
-        if locked:
-            _lock(ws, ri, 2, _tease(val, keep=55))
-        else:
-            cl(ws, ri, 2, val, bg=C_ACCENT)
-        rh(ws, ri, 50)
+    for label, val, locked in stage1_rows:
+        cl(ws, row, 1, label, bold=True, bg="FDE68A", color=C_DARK)
+        _lock(ws, row, 2, _tease(val, 60)) if locked else cl(ws, row, 2, val, bg=C_ACCENT)
+        rh(ws, row, 50); row += 1
 
-    tgt_row = 3 + len(meta_rows) + 1
-    section_header(ws, tgt_row, "🎯  FIRST 3 TARGETS", span=3, bg=C_MID)
-    col_headers(ws, tgt_row + 1, ["TARGET", "TYPE", "WHY NOW"], bg=C_MID)
-    for ti, tgt in enumerate(offer.get("first_three_targets", [])[:3]):
-        row = tgt_row + 2 + ti
-        bg  = C_LIGHT if ti % 2 == 0 else "FFFFFF"
+    # Stage 2 — Paid Pilot
+    row += 1
+    section_header(ws, row, f"STAGE 2 (PAID PILOT) — {s2.get('name','4-Week Team Pilot')}", span=2, bg=C_MID)
+    row += 1
+    stage2_rows = [
+        ("WHAT IT IS",            s2.get("what_it_is",""),        False),
+        ("DURATION",              s2.get("duration","4 weeks"),   False),
+        ("WHAT HAPPENS",          s2.get("what_happens",""),      False),
+        ("DELIVERABLES",          s2.get("deliverables",""),      False),
+        ("SUCCESS METRIC",        s2.get("success_metric",""),    False),
+        ("HOW TO FRAME IT TO HR", s2.get("how_to_frame_it_to_hr",""), is_free),
+        ("PRICE RANGE",           f"${s2.get('price_low',0):,} – ${s2.get('price_high',0):,}", is_free),
+        ("PRICING LOGIC",         s2.get("pricing_logic",""),    is_free),
+    ]
+    for label, val, locked in stage2_rows:
+        cl(ws, row, 1, label, bold=True, bg="FDE68A", color=C_DARK)
+        _lock(ws, row, 2, _tease(val, 60)) if locked else cl(ws, row, 2, val, bg=C_ACCENT)
+        rh(ws, row, 50); row += 1
+
+    # Stage 3 — Adoption Program
+    row += 1
+    section_header(ws, row, f"STAGE 3 (RECURRING) — {s3.get('name','Organisation Adoption Program')}", span=2, bg=C_DARK)
+    row += 1
+    stage3_rows = [
+        ("WHAT IT IS",        s3.get("what_it_is",""),     False),
+        ("DURATION",          s3.get("duration",""),        False),
+        ("FORMAT",            s3.get("format",""),          False),
+        ("DELIVERABLES",      s3.get("deliverables",""),    is_free),
+        ("SUCCESS METRIC",    s3.get("success_metric",""),  is_free),
+        ("RENEWAL TRIGGER",   s3.get("renewal_trigger",""), is_free),
+        ("PRICE RANGE",       f"${s3.get('price_low',0):,} – ${s3.get('price_high',0):,}", is_free),
+        ("PRICING LOGIC",     s3.get("pricing_logic",""),   is_free),
+        ("ANNUAL RECURRING",  s3.get("annual_recurring_potential", 0), is_free),
+    ]
+    for label, val, locked in stage3_rows:
+        is_money = label == "ANNUAL RECURRING"
+        cl(ws, row, 1, label, bold=True, bg="FDE68A", color=C_DARK)
+        if locked:
+            _lock(ws, row, 2, _tease(str(val), 60))
+        else:
+            c = cl(ws, row, 2, val, bg=C_ACCENT)
+            if is_money and isinstance(val, int): money_fmt(c)
+        rh(ws, row, 50); row += 1
+
+    # Cold Outreach Email
+    row += 1
+    section_header(ws, row, "📧  COLD OUTREACH EMAIL — TO HR DIRECTOR", span=2, bg=C_MID)
+    row += 1
+    email_rows = [
+        ("SUBJECT LINE",    outreach.get("subject_line",""),   False),
+        ("BODY",            outreach.get("body",""),           is_free),
+        ("CTA",             outreach.get("cta",""),            is_free),
+        ("FOLLOW-UP DAY 3", outreach.get("follow_up_day_3",""), is_free),
+        ("FOLLOW-UP DAY 7", outreach.get("follow_up_day_7",""), is_free),
+    ]
+    for label, val, locked in email_rows:
+        cl(ws, row, 1, label, bold=True, bg="FDE68A", color=C_DARK)
+        _lock(ws, row, 2, _tease(val, 80)) if locked else cl(ws, row, 2, val, bg=C_ACCENT)
+        rh(ws, row, 60); row += 1
+
+    # Target organisations
+    row += 1
+    section_header(ws, row, "🎯  FIRST 3 TARGET ORGANISATIONS", span=3, bg=C_MID)
+    row += 1
+    col_headers(ws, row, ["ORGANISATION", "INDUSTRY / SIZE", "ENTRY CONTACT + WHY NOW"], bg=C_MID)
+    row += 1
+    for ti, tgt in enumerate(data.get("target_organisations", [])[:3]):
+        bg = C_LIGHT if ti % 2 == 0 else "FFFFFF"
         if is_free:
             cl(ws, row, 1, f"🔒 Target {ti+1}", italic=True, color=LOCK_FG, bg=LOCK_BG)
             _lock(ws, row, 2); _lock(ws, row, 3)
         else:
-            cl(ws, row, 1, tgt.get("target", ""), bold=True, bg=bg, color=C_DARK)
-            cl(ws, row, 2, tgt.get("type", ""),   bg=bg)
-            cl(ws, row, 3, tgt.get("why_now", ""), bg=bg)
-        rh(ws, row, 45)
+            cl(ws, row, 1, tgt.get("name",""),    bold=True, bg=bg, color=C_DARK)
+            cl(ws, row, 2, f"{tgt.get('industry','')} / {tgt.get('size','')}", bg=bg)
+            cl(ws, row, 3, f"{tgt.get('entry_contact_title','')} — {tgt.get('why_now','')} | Signal: {tgt.get('hr_pain_signal','')}", bg=bg)
+        rh(ws, row, 55); row += 1
 
-    cw(ws, 1, 30); cw(ws, 2, 26); cw(ws, 3, 48)
+    cw(ws, 1, 30); cw(ws, 2, 72)
 
 
 def build_c_revenue_comparison_sheet(ws, data, is_free=False):
     """Sheet 3: Side-by-side revenue scenarios."""
     rc = data.get("revenue_comparison", {})
-    s1 = rc.get("scenario_1on1_only", {})
-    s2 = rc.get("scenario_expansion", {})
-    s3 = rc.get("scenario_full_scale", {})
+    s1 = rc.get("scenario_1on1_only",    {})
+    s2 = rc.get("scenario_add_pilot",    {})
+    s3 = rc.get("scenario_full_adoption",{})
 
     section_header(ws, 1, "📊  REVENUE SCENARIO COMPARISON", span=4, bg=C_DARK)
-    col_headers(ws, 3, ["METRIC", "1:1 ONLY (NOW)", "1:1 + EXPANSION OFFER", "FULLY SCALED (YEAR 2)"], bg=C_MID)
+    col_headers(ws, 3, ["METRIC", "1:1 ONLY (NOW)", "1:1 + ONE PILOT/MONTH", "3 ADOPTION CLIENTS (YR 2)"], bg=C_MID)
 
     rows_data = [
         ("LABEL",           s1.get("label",""), s2.get("label",""), s3.get("label","")),
         ("MONTHLY REVENUE", s1.get("monthly_revenue",0), s2.get("monthly_revenue",0), s3.get("monthly_revenue",0)),
         ("ANNUAL REVENUE",  s1.get("annual_revenue",0),  s2.get("annual_revenue",0),  s3.get("annual_revenue",0)),
         ("HOURS/WEEK",      s1.get("hours_per_week",0),  s2.get("hours_per_week",0),  s3.get("hours_per_week",0)),
-        ("NOTES",           s1.get("note",""),           s2.get("note",""),           s3.get("note","")),
+        ("NOTES",           s1.get("note",""),            s2.get("note",""),           s3.get("note","")),
     ]
     for ri, (label, v1, v2, v3) in enumerate(rows_data, 4):
-        is_money = "REVENUE" in label
+        is_money  = "REVENUE" in label
         locked_s2 = is_free and label not in ("LABEL", "MONTHLY REVENUE")
         locked_s3 = is_free
 
@@ -922,84 +990,110 @@ def build_c_revenue_comparison_sheet(ws, data, is_free=False):
 
         rh(ws, ri, 50)
 
-    cw(ws, 1, 24); cw(ws, 2, 28); cw(ws, 3, 32); cw(ws, 4, 32)
+    cw(ws, 1, 24); cw(ws, 2, 30); cw(ws, 3, 34); cw(ws, 4, 34)
 
 
 def build_c_marketing_sheet(ws, data, is_free=False):
-    """Sheet 4: Marketing strategy for the NEW offer (not 1:1 channels)."""
-    channels = data.get("marketing_for_new_offer", [])
-    section_header(ws, 1, "📣  MARKETING YOUR NEW OFFER — NOT YOUR 1:1 CHANNELS", span=5, bg=C_DARK)
+    """Sheet 4: LinkedIn-only B2B marketing strategy for the corporate offer."""
+    li = data.get("linkedin_strategy", {})
+    audit = li.get("profile_rewrite", {})
+
+    section_header(ws, 1, "📣  LINKEDIN STRATEGY FOR CORPORATE BUYERS", span=5, bg=C_DARK)
     ws.merge_cells("A2:E2")
-    cl(ws, 2, 1, "These channels are specifically chosen to reach buyers of your EXPANSION OFFER — corporate, speaking, or group.",
+    cl(ws, 2, 1,
+       "Corporate buyers are NOT on Instagram. This is your LinkedIn strategy to reach HR Directors, L&D Managers, and Chief People Officers.",
        italic=True, bg=C_LIGHT, color=C_DARK, size=10)
-    rh(ws, 2, 24)
+    rh(ws, 2, 28)
 
+    # Profile rewrite
     row = 4
-    for idx, ch in enumerate(channels):
-        palette_bg = [C_MID, "2E5B8A", "1F6B45"][idx % 3]
-        ch_name = ch.get("channel", f"Channel {idx+1}")
-        ws.merge_cells(f"A{row}:E{row}")
-        cl(ws, row, 1, f"📌  {ch_name.upper()} — {ch.get('priority','Primary')} Channel",
-           bold=True, color="FFFFFF", bg=palette_bg, size=11)
-        rh(ws, row, 24); row += 1
+    section_header(ws, row, "👤  PROFILE REWRITE — CORPORATE LANGUAGE", span=5, bg=C_MID)
+    row += 1
+    profile_rows = [
+        ("HEADLINE (BEFORE)", audit.get("headline_before",""), False),
+        ("HEADLINE (AFTER)",  audit.get("headline_after",""),  False),
+        ("ABOUT (BEFORE)",    audit.get("about_before",""),    False),
+        ("ABOUT (AFTER)",     audit.get("about_after",""),     is_free),
+        ("BANNER TIP",        audit.get("banner_tip",""),      False),
+        ("FEATURED SECTION",  audit.get("featured_section",""), is_free),
+    ]
+    for label, val, locked in profile_rows:
+        cl(ws, row, 1, label, bold=True, bg="FDE68A", color=C_DARK, size=9)
+        ws.merge_cells(f"B{row}:E{row}")
+        if locked:
+            cl(ws, row, 2, _tease(val, 80), italic=True, color=LOCK_FG, bg=LOCK_BG, size=9)
+        else:
+            cl(ws, row, 2, val, bg=C_ACCENT, size=9)
+        rh(ws, row, 55); row += 1
 
-        ws.merge_cells(f"A{row}:E{row}")
-        cl(ws, row, 1, ch.get("why_this_channel_for_this_offer", ""),
-           italic=True, bg=C_ACCENT, color=C_DARK, size=9)
+    # Content pillars
+    row += 1
+    section_header(ws, row, "📌  CONTENT PILLARS — HR PAIN FIRST, SOLUTION SECOND", span=5, bg=C_MID)
+    row += 1
+    for pi, pillar in enumerate(li.get("content_pillars", [])):
+        bg_p = C_LIGHT if pi % 2 == 0 else "FFFFFF"
+        cl(ws, row, 1, pillar.get("pillar",""),              bold=True, bg="FDE68A", color=C_DARK, size=9)
+        ws.merge_cells(f"B{row}:C{row}")
+        cl(ws, row, 2, f"HR pain: {pillar.get('hr_pain_it_addresses','')}",  bg=bg_p, size=9)
+        ws.merge_cells(f"D{row}:E{row}")
+        hooks_text = "\n".join(f"▸ {h}" for h in pillar.get("hooks", []))
+        cl(ws, row, 4, hooks_text, bg=bg_p, size=9)
+        rh(ws, row, 60); row += 1
+
+        post = pillar.get("sample_post","")
+        cta  = pillar.get("cta_in_post","")
+        cl(ws, row, 1, "SAMPLE POST", bold=True, bg="FDE68A", color=C_DARK, size=9)
+        ws.merge_cells(f"B{row}:E{row}")
+        full_post = f"{post}\n\n📌 CTA: {cta}" if cta else post
+        if is_free:
+            cl(ws, row, 2, (full_post[:90]+"…  🔒") if len(full_post)>90 else full_post+"  🔒",
+               italic=True, color=LOCK_FG, bg=LOCK_BG, size=9)
+            rh(ws, row, 40)
+        else:
+            cl(ws, row, 2, full_post, bg=bg_p, size=9)
+            rh(ws, row, max(80, min(220, len(full_post)//2)))
+        row += 1
+
+    # 2-week calendar
+    row += 1
+    section_header(ws, row, "📅  2-WEEK POSTING CALENDAR", span=5, bg=C_MID)
+    row += 1
+    col_headers(ws, row, ["DAY", "FORMAT", "PILLAR", "HOOK", "CTA"], bg=C_MID)
+    row += 1
+    for entry in li.get("two_week_calendar", []):
+        bg = C_LIGHT if row % 2 == 0 else "FFFFFF"
+        cl(ws, row, 1, entry.get("day",""),    bold=True, bg="FDE68A", color=C_DARK, size=9)
+        cl(ws, row, 2, entry.get("format",""), bg=bg, size=9)
+        cl(ws, row, 3, entry.get("pillar",""), bg=bg, size=9)
+        cl(ws, row, 4, entry.get("hook",""),   bg=bg, size=9)
+        cl(ws, row, 5, entry.get("cta",""),    bg=bg, size=9)
+        rh(ws, row, 40); row += 1
+
+    # Quick wins
+    row += 1
+    section_header(ws, row, "⚡  QUICK WINS — DO IN 48 HRS", span=5, bg=C_MID)
+    row += 1
+    for qi, win in enumerate(li.get("quick_wins",[]), 1):
+        cl(ws, row, 1, f"#{qi}", bold=True, bg="FDE68A", color=C_DARK, size=9, align="center")
+        ws.merge_cells(f"B{row}:E{row}")
+        if is_free and qi > 1:
+            cl(ws, row, 2, _tease(win, 60), italic=True, color=LOCK_FG, bg=LOCK_BG, size=9)
+        else:
+            cl(ws, row, 2, win, bg=C_ACCENT, size=9)
+        rh(ws, row, 45); row += 1
+
+    # KPIs
+    row += 1
+    kpis = li.get("kpis", {})
+    section_header(ws, row, "📈  SUCCESS METRICS", span=5, bg=C_MID)
+    row += 1
+    for kk, kv in kpis.items():
+        cl(ws, row, 1, kk.replace("_"," ").title(), bold=True, bg="FDE68A", color=C_DARK, size=9)
+        ws.merge_cells(f"B{row}:E{row}")
+        cl(ws, row, 2, str(kv), bg=C_ACCENT, size=9)
         rh(ws, row, 28); row += 1
 
-        # Pillars
-        for pi, pillar in enumerate(ch.get("content_pillars", [])):
-            bg_p = C_LIGHT if pi % 2 == 0 else "FFFFFF"
-            cl(ws, row, 1, pillar.get("pillar",""), bold=True, bg="FDE68A", color=C_DARK, size=9)
-            ws.merge_cells(f"B{row}:C{row}")
-            cl(ws, row, 2, pillar.get("purpose",""), bg=bg_p, size=9)
-            ws.merge_cells(f"D{row}:E{row}")
-            hooks_text = "\n".join(f"▸ {h}" for h in pillar.get("hooks", []))
-            cl(ws, row, 4, hooks_text, bg=bg_p, size=9)
-            rh(ws, row, 55); row += 1
-
-            # Sample post
-            post = pillar.get("sample_post", "")
-            cl(ws, row, 1, "SAMPLE POST", bold=True, bg="FDE68A", color=C_DARK, size=9)
-            ws.merge_cells(f"B{row}:E{row}")
-            if is_free:
-                cl(ws, row, 2, (post[:90]+"…  🔒") if len(post)>90 else post+"  🔒",
-                   italic=True, color=LOCK_FG, bg=LOCK_BG, size=9)
-                rh(ws, row, 40)
-            else:
-                cl(ws, row, 2, post, bg=bg_p, size=9)
-                rh(ws, row, max(70, min(200, len(post)//2)))
-            row += 1
-
-        # Quick wins
-        ws.merge_cells(f"A{row}:E{row}")
-        cl(ws, row, 1, "⚡ QUICK WINS (48 hrs)", bold=True, color="FFFFFF",
-           bg=palette_bg, size=10)
-        rh(ws, row, 20); row += 1
-        for qi, win in enumerate(ch.get("quick_wins", []), 1):
-            cl(ws, row, 1, f"#{qi}", bold=True, bg="FDE68A", color=C_DARK, size=9, align="center")
-            ws.merge_cells(f"B{row}:E{row}")
-            if is_free and qi > 1:
-                cl(ws, row, 2, _tease(win, 60), italic=True, color=LOCK_FG, bg=LOCK_BG, size=9)
-            else:
-                cl(ws, row, 2, win, bg=C_ACCENT, size=9)
-            rh(ws, row, 45); row += 1
-
-        # KPIs
-        kpis = ch.get("kpis", {})
-        ws.merge_cells(f"A{row}:E{row}")
-        cl(ws, row, 1, "📈 SUCCESS METRICS", bold=True, color="FFFFFF", bg=palette_bg, size=10)
-        rh(ws, row, 20); row += 1
-        for kk, kv in kpis.items():
-            cl(ws, row, 1, kk.replace("_", " ").title(), bold=True, bg="FDE68A", color=C_DARK, size=9)
-            ws.merge_cells(f"B{row}:E{row}")
-            cl(ws, row, 2, str(kv), bg=C_ACCENT, size=9)
-            rh(ws, row, 28); row += 1
-
-        row += 1  # spacer between channels
-
-    cw(ws, 1, 20); cw(ws, 2, 24); cw(ws, 3, 22); cw(ws, 4, 28); cw(ws, 5, 20)
+    cw(ws, 1, 22); cw(ws, 2, 24); cw(ws, 3, 22); cw(ws, 4, 30); cw(ws, 5, 24)
 
 
 def build_c_action_sheet(ws, data, is_free=False):
@@ -1046,13 +1140,13 @@ def build_c_competitor_sheet(ws, data, is_free=False):
 
     COMP_COLORS = [("B45309","FEF3C7"), ("1D4ED8","DBEAFE"), ("065F46","D1FAE5")]
     FIELD_LABELS = [
-        ("HOW THEY MONETISE THIS CHANNEL", "how_they_monetise_this_channel"),
-        ("FLAGSHIP OFFER",                  "flagship_offer"),
-        ("FLAGSHIP PRICE",                  "flagship_price"),
-        ("AUDIENCE SIZE",                   "audience_size"),
-        ("WHAT THEY DO WELL",               "what_they_do_well"),
-        ("GAP YOU CAN FILL",                "gap_you_can_fill"),
-        ("YOUR EDGE",                       "your_edge"),
+        ("HOW THEY SELL TO CORPORATES",  "how_they_sell_to_corporates"),
+        ("FLAGSHIP CORPORATE OFFER",     "flagship_corporate_offer"),
+        ("FLAGSHIP PRICE",               "flagship_price"),
+        ("AUDIENCE SIZE",                "audience_size"),
+        ("WHAT THEY DO WELL",            "what_they_do_well"),
+        ("GAP YOU CAN FILL",             "gap_you_can_fill"),
+        ("YOUR EDGE",                    "your_edge"),
     ]
     current_row = 4
     for idx, comp in enumerate(data.get("competitors", [])[:3]):
