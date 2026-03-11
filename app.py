@@ -2444,8 +2444,11 @@ def quiz_page(): return render_template("quiz.html")
 def health():
     return jsonify({
         "status": "ok",
-        "paths_supported": ["A", "B", "C"],
-        "path_c_description": "Established 1:1 coach with untapped corporate/speaking/group potential"
+        "paths_supported": ["A", "B", "C", "D"],
+        "path_a_description": "Established group cohort coach with paid ads — leaky acquisition",
+        "path_b_description": "Beginner or early-stage coach — build offer and first clients",
+        "path_c_description": "Corporate-active coach not yet on speaking stages",
+        "path_d_description": "Established somatic/premium coach not yet in corporate"
     })
 
 
