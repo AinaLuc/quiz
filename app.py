@@ -243,23 +243,68 @@ CHANNEL-SPECIFIC profile_audit keys:
   Partnerships → partner_target_list, partner_offer, outreach_script, co_marketing_asset"""
 
 
-SYSTEM_PROMPT_A = """You are an expert coaching business strategist specialising in B2B revenue expansion.
+SYSTEM_PROMPT_A = """You are an expert coaching business strategist specialising in group program growth and recurring revenue systems.
 
-Your job: take quiz answers from a coach who is FULLY BOOKED with 1:1 clients (Path A)
-and return a plan that helps them scale revenue WITHOUT adding more 1:1 hours.
+Your job: take quiz answers from a coach who is running a GROUP COHORT PROGRAM and using paid ads to fill it (Path A).
+Their core problem is NOT capacity — it is a LEAKY ACQUISITION ENGINE.
+They are spending money on ads, filling cohorts, and then starting from zero every cycle.
+They need three things: (1) an organic acquisition engine to reduce ad dependence,
+(2) an alumni continuity offer so graduates keep paying, and (3) a waitlist system that fills the next cohort automatically.
 
-The two channels are: (1) Corporate Adoption Offer, (2) Speaking as a Revenue Channel.
-These coaches do NOT need offer positioning or lead funnels — they already have clients.
-They need to enter corporate doors that are already open with budget attached.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RULE 1 — DIAGNOSE THE LEAK FIRST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The cohort_audit section must diagnose EXACTLY where the revenue is leaking:
+- Acquisition cost: estimate cost per enrolled client from paid ads (industry avg: $150–$600 per lead, 3–10% conversion)
+- Churn: what happens to graduates? They disappear. That is the core leak.
+- Reset cost: every new cohort requires a full restart of acquisition spend
+- The diagnosis must make the coach feel seen — use their exact words from Q5 (fear) and Q16 (dream)
 
-CRITICAL FRAMING RULES:
-- Corporate buyers fund: change management, initiative adoption, retention programs, leadership transitions — NOT "coaching".
-- The offer must enter through a budget line that already exists, not create a new one.
-- Pricing anchors to COST AVOIDED (replacing one manager = $50–100K) not hourly rate.
-- The speaking talk must NAME A PROBLEM the audience feels but can't articulate — not inspire.
-- buying_trigger is as important as buyer_title: tell them WHEN to reach out, not just who.
-- All numeric fields MUST be plain integers.
-- Return ONLY valid JSON. No markdown. No code blocks."""
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RULE 2 — ALUMNI CONTINUITY OFFER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Design a specific alumni continuity offer. This is NOT a new program — it is what graduates join IMMEDIATELY after the cohort ends.
+- Must be priced lower than the flagship cohort (20–40% of cohort price)
+- Must require minimal coach time (async, community, monthly group call)
+- Must have a clear identity separate from the cohort ("The Vault", "Alumni Momentum", etc.)
+- Must have a pitch script the coach can deliver in the final week of the cohort
+- Revenue math: show what 30%, 50%, 70% alumni retention looks like in monthly recurring revenue
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RULE 3 — ORGANIC ACQUISITION ENGINE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Design a content system that generates inbound leads WITHOUT paid ads.
+- Must use the channels the coach already has (from Q17)
+- Must include: 3 content pillars, hooks, a referral activation script for current/past clients, and a lead magnet that pre-qualifies for the cohort
+- The goal is to reduce cost-per-lead, not eliminate ads — frame it as "de-risking" not "stopping ads"
+- Include a 2-week posting calendar
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RULE 4 — WAITLIST SYSTEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Design a specific waitlist mechanism that means the next cohort is 50%+ filled BEFORE the current one ends.
+- Waitlist offer: what do people get for joining early? (bonus module, price lock, priority spot)
+- Waitlist CTA: exact words the coach uses inside the current cohort to get referrals
+- Waitlist nurture: 3-email sequence for people on the waitlist
+- Target: fill 50% of next cohort from waitlist + alumni referrals, 50% from organic + ads
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RULE 5 — REVENUE MATH
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Show 3 scenarios side by side:
+1. Current state: paid ads only, no continuity, reset every cycle
+2. With alumni continuity: same cohort revenue + 50% retention MRR
+3. With organic engine + waitlist: lower acquisition cost, higher fill rate, compound growth
+All revenue figures must be plain integers derived from their quiz answers (Q10 pricing, Q14 hours).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GENERAL RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Return ONLY valid JSON. No markdown. No code blocks.
+- All numeric fields MUST be plain integers — no $ signs, no commas, no text.
+- Use the coach's exact words from Q5 (fear/pain) and Q16 (dream) in the personal_note and cohort_audit.
+- Every field must be specific to THEIR niche and program — never generic.
+- 3 REAL named competitors with actual pricing — never invent names."""
 
 
 SYSTEM_PROMPT_C = """You are an expert B2B revenue strategist who helps established somatic, nervous system, and wellness coaches
@@ -451,78 +496,176 @@ Return this exact JSON structure fully populated:
 
 
 def _call_openai_path_a(answers: dict) -> dict:
+    pricing_range = answers.get('Q10', answers.get('QA10', '$2,000–$5,000'))
+    hours_range   = answers.get('Q14', answers.get('QA13', '15–30 hours'))
     user_message = f"""
-Generate a personalised scale-beyond-1:1 plan (Path A — Established Coach) from these quiz answers.
+Analyse this group cohort coach and build their Leaky Cohort Fix strategy (Path A).
 
-QB1  - Typical 1:1 client's professional role: "{answers.get('QB1', '')}"
-QB2  - Transformation clients describe most often: "{answers.get('QB2', '')}"
-QB3  - Has a client ever asked you to work with their team?: {answers.get('QB3', '')}
-QB4  - When speaking on stage, who's in the room?: "{answers.get('QB4', '')}"
-QB5  - Current 1:1 rate: {answers.get('QB5', '')}
-QB6  - Hours per week coaching: {answers.get('QB6', '')}
-QB7  - Biggest fear about going corporate or speaking: "{answers.get('QB7', '')}"
-QB8  - Preferred new channel: {answers.get('QB8', '')}
+━━━ THEIR QUIZ ANSWERS ━━━
+Expertise / niche:           "{answers.get('Q1', answers.get('QA1', ''))}"
+Natural advice people seek:  "{answers.get('Q2', answers.get('QA2', ''))}"
+Experience level:            {answers.get('Q3', 'Advanced')}
+Ideal client:                "{answers.get('Q4', answers.get('QA4', ''))}"
+Client #1 problem (exact):   "{answers.get('Q5', answers.get('QA5', ''))}"
+What clients want most:      "{answers.get('Q6', answers.get('QA5', ''))}"
+Would NOT work with:         "{answers.get('Q7', answers.get('QA6', ''))}"
+Delivery format:             {answers.get('Q8', answers.get('QA8', ''))}
+Program length:              {answers.get('Q9', answers.get('QA9', ''))}
+Pricing RANGE (quiz):        {pricing_range}
+Audience size:               {answers.get('Q12', answers.get('QA11', ''))}
+Biggest fear:                "{answers.get('Q13', answers.get('QA12', ''))}"
+Hours/week RANGE (quiz):     {hours_range}
+Current channels:            "{answers.get('Q17', answers.get('QA7', ''))}"
+12-month vision:             "{answers.get('Q16', answers.get('QA14', ''))}"
+
+━━━ INSTRUCTIONS ━━━
+1. COHORT AUDIT: Diagnose the leak. Use midpoint of pricing/hours ranges. Label as estimates.
+2. ALUMNI CONTINUITY: Design a specific post-cohort offer with pitch script + retention revenue math.
+3. ORGANIC ENGINE: Content system for their existing channels. Reduce ad dependence.
+4. WAITLIST SYSTEM: Exact mechanism + email sequence to pre-fill next cohort.
+5. REVENUE SCENARIOS: 3 side-by-side scenarios showing the compound effect.
 
 Return this exact JSON structure fully populated:
 {{
   "coach_path": "A",
-  "primary_channel": "corporate",
   "personal_note": "",
-  "revenue_ceiling": {{
-    "current_hourly_rate": 0,
-    "weekly_coaching_hours": 0,
-    "monthly_1on1_revenue": 0,
-    "annual_1on1_revenue": 0,
-    "capacity_ceiling_note": "",
-    "corporate_comparison": {{
-      "one_engagement_revenue": 0,
-      "equivalent_1on1_months": 0,
-      "comparison_note": ""
+
+  "cohort_audit": {{
+    "pricing_range_used": "{pricing_range}",
+    "hours_range_used": "{hours_range}",
+    "estimated_cohort_price": 0,
+    "estimated_cohort_size": 0,
+    "estimated_cohort_revenue_per_cycle": 0,
+    "estimated_cycles_per_year": 0,
+    "estimated_annual_gross_revenue": 0,
+    "estimated_ad_spend_per_cycle": 0,
+    "estimated_cost_per_enrolled_client": 0,
+    "data_source_note": "",
+    "the_leak": "",
+    "reset_cost_diagnosis": "",
+    "what_they_dont_see": ""
+  }},
+
+  "alumni_continuity": {{
+    "offer_name": "",
+    "tagline": "",
+    "what_it_is": "",
+    "format": "",
+    "price_per_month": 0,
+    "what_alumni_get": "",
+    "coach_time_required_hours_per_month": 0,
+    "pitch_script": "",
+    "pitch_timing": "Final week of cohort",
+    "retention_scenarios": [
+      {{"label": "Conservative (30% retain)", "alumni_retained": 0, "monthly_recurring_revenue": 0, "annual_recurring_revenue": 0}},
+      {{"label": "Realistic (50% retain)",    "alumni_retained": 0, "monthly_recurring_revenue": 0, "annual_recurring_revenue": 0}},
+      {{"label": "Strong (70% retain)",       "alumni_retained": 0, "monthly_recurring_revenue": 0, "annual_recurring_revenue": 0}}
+    ]
+  }},
+
+  "organic_engine": {{
+    "why_organic_matters": "",
+    "current_acquisition_dependency": "",
+    "lead_magnet": {{
+      "name": "",
+      "format": "",
+      "what_it_does": "",
+      "how_it_pre_qualifies": "",
+      "cta": ""
+    }},
+    "referral_activation": {{
+      "script": "",
+      "timing": "",
+      "incentive": ""
+    }},
+    "content_pillars": [
+      {{"pillar": "", "why_it_attracts_cohort_buyers": "", "hooks": ["","",""], "sample_post": ""}},
+      {{"pillar": "", "why_it_attracts_cohort_buyers": "", "hooks": ["","",""], "sample_post": ""}},
+      {{"pillar": "", "why_it_attracts_cohort_buyers": "", "hooks": ["","",""], "sample_post": ""}}
+    ],
+    "two_week_calendar": [
+      {{"day": "Mon Wk1", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Tue Wk1", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Wed Wk1", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Thu Wk1", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Fri Wk1", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Mon Wk2", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Tue Wk2", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Wed Wk2", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Thu Wk2", "format": "", "pillar": "", "hook": "", "cta": ""}},
+      {{"day": "Fri Wk2", "format": "", "pillar": "", "hook": "", "cta": ""}}
+    ],
+    "quick_wins": ["", "", ""]
+  }},
+
+  "waitlist_system": {{
+    "how_it_works": "",
+    "waitlist_offer": "",
+    "waitlist_cta_inside_cohort": "",
+    "waitlist_nurture_emails": [
+      {{"email": 1, "subject": "", "body": "", "cta": ""}},
+      {{"email": 2, "subject": "", "body": "", "cta": ""}},
+      {{"email": 3, "subject": "", "body": "", "cta": ""}}
+    ],
+    "target_fill_split": "50% waitlist + alumni referrals / 50% organic + paid",
+    "milestone": ""
+  }},
+
+  "revenue_scenarios": {{
+    "scenario_current": {{
+      "label": "Current State — Paid Ads Only",
+      "annual_cohort_revenue": 0,
+      "annual_ad_spend": 0,
+      "alumni_mrr": 0,
+      "annual_net_revenue": 0,
+      "hours_per_week": 0,
+      "note": ""
+    }},
+    "scenario_add_continuity": {{
+      "label": "Add Alumni Continuity Offer",
+      "annual_cohort_revenue": 0,
+      "annual_ad_spend": 0,
+      "alumni_mrr": 0,
+      "annual_net_revenue": 0,
+      "hours_per_week": 0,
+      "note": ""
+    }},
+    "scenario_full_system": {{
+      "label": "Organic Engine + Waitlist + Continuity (Year 2)",
+      "annual_cohort_revenue": 0,
+      "annual_ad_spend": 0,
+      "alumni_mrr": 0,
+      "annual_net_revenue": 0,
+      "hours_per_week": 0,
+      "note": ""
     }}
   }},
-  "corporate_offer": {{
-    "corporate_pain": "",
-    "offer_name": "",
-    "format": "",
-    "duration": "",
-    "buyer_title": "",
-    "buying_trigger": "",
-    "pricing_logic": "",
-    "price_low": 0,
-    "price_high": 0,
-    "target_companies": [
-      {{"name": "", "industry": "", "size": "", "why_now": ""}},
-      {{"name": "", "industry": "", "size": "", "why_now": ""}},
-      {{"name": "", "industry": "", "size": "", "why_now": ""}}
-    ],
-    "outreach_one_liner": "",
-    "your_edge": ""
-  }},
-  "speaking_strategy": {{
-    "talk_title": "",
-    "the_tension": "",
-    "audience_pain": "",
-    "event_types": [
-      {{"type": "", "booking_path": "", "fee_range": "", "notes": ""}},
-      {{"type": "", "booking_path": "", "fee_range": "", "notes": ""}},
-      {{"type": "", "booking_path": "", "fee_range": "", "notes": ""}}
-    ],
-    "fee_benchmark_note": "",
-    "back_of_room_offer": "",
-    "first_outreach_action": ""
-  }},
+
   "action_plan": [
-    {{"week": "Weeks 1-4",  "phase": "Translate & Position", "focus": "", "actions": "", "milestone": ""}},
-    {{"week": "Weeks 5-8",  "phase": "First Conversations",  "focus": "", "actions": "", "milestone": ""}},
-    {{"week": "Weeks 9-12", "phase": "Pilot Engagement",     "focus": "", "actions": "", "milestone": ""}}
+    {{"week": "Weeks 1-2",   "phase": "Diagnose & Design",        "focus": "", "actions": "", "milestone": ""}},
+    {{"week": "Weeks 3-4",   "phase": "Launch Alumni Offer",      "focus": "", "actions": "", "milestone": ""}},
+    {{"week": "Weeks 5-6",   "phase": "Organic Engine Live",      "focus": "", "actions": "", "milestone": ""}},
+    {{"week": "Weeks 7-9",   "phase": "Waitlist System Active",   "focus": "", "actions": "", "milestone": ""}},
+    {{"week": "Weeks 10-12", "phase": "Compound & Systematise",   "focus": "", "actions": "", "milestone": ""}}
   ],
+
   "fear_reframe": {{
-    "fear": "", "truth": "", "action_1": "", "action_2": "", "action_3": ""
-  }}
+    "fear": "",
+    "truth": "",
+    "action_1": "",
+    "action_2": "",
+    "action_3": ""
+  }},
+
+  "competitors": [
+    {{"name": "", "url": "", "niche": "", "their_group_model": "", "how_they_retain_alumni": "", "flagship_price": "", "your_edge": ""}},
+    {{"name": "", "url": "", "niche": "", "their_group_model": "", "how_they_retain_alumni": "", "flagship_price": "", "your_edge": ""}},
+    {{"name": "", "url": "", "niche": "", "their_group_model": "", "how_they_retain_alumni": "", "flagship_price": "", "your_edge": ""}}
+  ]
 }}
 """
     response = client.chat.completions.create(
-        model="gpt-4o", max_tokens=6000,
+        model="gpt-4o", max_tokens=12000,
         response_format={"type": "json_object"},
         messages=[{"role": "system", "content": SYSTEM_PROMPT_A},
                   {"role": "user",   "content": user_message}]
@@ -1309,167 +1452,340 @@ def build_c_upgrade_sheet(ws, payment_url: str = ""):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PATH A — EXCEL SHEETS
+# PATH A — EXCEL SHEETS (Leaky Cohort Coach)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def build_a_revenue_ceiling_sheet(ws, data, is_free=False):
-    rc = data.get("revenue_ceiling", {})
-    cc = rc.get("corporate_comparison", {})
-    section_header(ws, 1, "REVENUE CEILING DIAGNOSIS", span=2, bg="1a3a2a")
+A_DARK   = "1a2a3a"   # deep navy
+A_MID    = "1e4d6b"   # mid blue
+A_ACCENT = "E8F4FD"   # pale blue
+A_LIGHT  = "D0E9F7"   # light blue
+A_GOLD   = "F59E0B"   # amber CTA
 
-    rows = [
-        ("CURRENT HOURLY RATE",          rc.get("current_hourly_rate", 0),    False, True),
-        ("WEEKLY COACHING HOURS",         rc.get("weekly_coaching_hours", 0),  False, False),
-        ("MONTHLY 1:1 REVENUE",           rc.get("monthly_1on1_revenue", 0),   False, True),
-        ("ANNUAL 1:1 REVENUE",            rc.get("annual_1on1_revenue", 0),    False, True),
-        ("THE CEILING",                   rc.get("capacity_ceiling_note", ""), False, False),
-        ("ONE CORPORATE ENGAGEMENT",      cc.get("one_engagement_revenue", 0), is_free, True),
-        ("EQUIVALENT 1:1 MONTHS",         cc.get("equivalent_1on1_months", 0), is_free, False),
-        ("WHY THIS MATTERS",              cc.get("comparison_note", ""),       is_free, False),
+
+def build_a_audit_sheet(ws, data, is_free=False):
+    """Sheet 1: Cohort audit — diagnose the leak."""
+    audit = data.get("cohort_audit", {})
+    section_header(ws, 1, "🔍  YOUR COHORT AUDIT — WHERE THE REVENUE IS LEAKING", span=2, bg=A_DARK)
+    ws.merge_cells("A2:B2")
+    cl(ws, 2, 1, data.get("personal_note", ""), bold=True, italic=True,
+       color=A_DARK, bg=A_LIGHT, size=12, align="center")
+    rh(ws, 2, 36)
+
+    audit_rows = [
+        ("PRICING RANGE (FROM QUIZ)",          audit.get("pricing_range_used", ""),                   False, False),
+        ("HOURS/WEEK RANGE (FROM QUIZ)",        audit.get("hours_range_used", ""),                     False, False),
+        ("EST. COHORT PRICE",                   audit.get("estimated_cohort_price", 0),                False, True),
+        ("EST. COHORT SIZE",                    audit.get("estimated_cohort_size", 0),                 False, False),
+        ("EST. REVENUE PER CYCLE",              audit.get("estimated_cohort_revenue_per_cycle", 0),    False, True),
+        ("EST. CYCLES PER YEAR",                audit.get("estimated_cycles_per_year", 0),             False, False),
+        ("EST. ANNUAL GROSS REVENUE",           audit.get("estimated_annual_gross_revenue", 0),        False, True),
+        ("EST. AD SPEND PER CYCLE",             audit.get("estimated_ad_spend_per_cycle", 0),          False, True),
+        ("EST. COST PER ENROLLED CLIENT",       audit.get("estimated_cost_per_enrolled_client", 0),    False, True),
+        ("HOW THESE WERE CALCULATED",           audit.get("data_source_note", ""),                     False, False),
+        ("THE LEAK",                            audit.get("the_leak", ""),                             False, False),
+        ("THE RESET COST",                      audit.get("reset_cost_diagnosis", ""),                 False, False),
+        ("WHAT YOU DON'T SEE YET",              audit.get("what_they_dont_see", ""),                   is_free, False),
     ]
-    for ri, (label, val, locked, is_money) in enumerate(rows, 3):
-        cl(ws, ri, 1, label, bold=True, bg="D9E1F2", color="1a3a2a", size=11)
+    for ri, (label, val, locked, is_money) in enumerate(audit_rows, 4):
+        cl(ws, ri, 1, label, bold=True, bg=A_LIGHT, color=A_DARK, size=10)
         if locked:
-            _lock(ws, ri, 2, "🔒 [Upgrade to see corporate comparison]")
+            _lock(ws, ri, 2, "🔒 [Unlock the full audit]")
         else:
-            c = cl(ws, ri, 2, val, bg="F0FFF4", size=11)
+            c = cl(ws, ri, 2, val, bg=A_ACCENT, size=10)
             if is_money and isinstance(val, int): money_fmt(c)
-        rh(ws, ri, 48)
-    cw(ws, 1, 30); cw(ws, 2, 65)
+        rh(ws, ri, 52)
+
+    cw(ws, 1, 36); cw(ws, 2, 72)
 
 
-def build_a_corporate_offer_sheet(ws, data, is_free=False):
-    co = data.get("corporate_offer", {})
-    section_header(ws, 1, "CORPORATE ADOPTION OFFER", span=2, bg="1a3a2a")
+def build_a_continuity_sheet(ws, data, is_free=False):
+    """Sheet 2: Alumni continuity offer — stop the leak."""
+    cont = data.get("alumni_continuity", {})
+    section_header(ws, 1, "🔁  ALUMNI CONTINUITY OFFER — STOP THE RESET", span=2, bg=A_DARK)
 
     meta_rows = [
-        ("CORPORATE PAIN",       co.get("corporate_pain", ""),       False),
-        ("OFFER NAME",           co.get("offer_name", ""),           False),
-        ("FORMAT",               co.get("format", ""),               False),
-        ("DURATION",             co.get("duration", ""),             False),
-        ("BUYER TITLE",          co.get("buyer_title", ""),          is_free),
-        ("BUYING TRIGGER",       co.get("buying_trigger", ""),       is_free),
-        ("PRICING LOGIC",        co.get("pricing_logic", ""),        is_free),
-        ("PRICE RANGE",          f"${co.get('price_low',0):,} – ${co.get('price_high',0):,}", is_free),
-        ("YOUR EDGE",            co.get("your_edge", ""),            False),
-        ("OUTREACH ONE-LINER",   co.get("outreach_one_liner", ""),   is_free),
+        ("OFFER NAME",                   cont.get("offer_name", ""),                    False),
+        ("TAGLINE",                       cont.get("tagline", ""),                       False),
+        ("WHAT IT IS",                    cont.get("what_it_is", ""),                    False),
+        ("FORMAT",                        cont.get("format", ""),                        False),
+        ("PRICE PER MONTH",               cont.get("price_per_month", 0),               False),
+        ("WHAT ALUMNI GET",               cont.get("what_alumni_get", ""),               False),
+        ("COACH TIME / MONTH",            f"{cont.get('coach_time_required_hours_per_month', 0)} hrs", False),
+        ("PITCH TIMING",                  cont.get("pitch_timing", "Final week of cohort"), False),
+        ("PITCH SCRIPT",                  cont.get("pitch_script", ""),                 is_free),
     ]
     row = 3
     for label, val, locked in meta_rows:
-        cl(ws, row, 1, label, bold=True, bg="D9E1F2", color="1a3a2a")
+        is_money = label == "PRICE PER MONTH"
+        cl(ws, row, 1, label, bold=True, bg=A_LIGHT, color=A_DARK, size=10)
         if locked:
-            _lock(ws, row, 2, _tease(val, keep=50))
+            _lock(ws, row, 2, _tease(str(val), keep=60))
         else:
-            cl(ws, row, 2, val, bg="F0FFF4")
-        rh(ws, row, 50); row += 1
+            c = cl(ws, row, 2, val, bg=A_ACCENT, size=10)
+            if is_money and isinstance(val, int): money_fmt(c)
+        rh(ws, row, 55); row += 1
 
+    # Retention revenue scenarios
     row += 1
-    section_header(ws, row, "TARGET COMPANIES", span=4, bg="2d6648")
+    section_header(ws, row, "📊  ALUMNI RETENTION REVENUE SCENARIOS", span=4, bg=A_MID)
     row += 1
-    col_headers(ws, row, ["COMPANY", "INDUSTRY", "SIZE", "WHY NOW"], bg="2d6648")
+    col_headers(ws, row, ["SCENARIO", "ALUMNI RETAINED", "MONTHLY RECURRING", "ANNUAL RECURRING"], bg=A_MID)
     row += 1
-    for ci, comp in enumerate(co.get("target_companies", [])[:3]):
-        bg = "EAF3ED" if ci % 2 == 0 else "FFFFFF"
-        if is_free:
-            cl(ws, row, 1, f"🔒 Company {ci+1}", italic=True, color=LOCK_FG, bg=LOCK_BG)
-            for c in range(2, 5): _lock(ws, row, c)
+    scenario_bgs = [A_ACCENT, "D1FAE5", "FEF9C3"]
+    for si, sc in enumerate(cont.get("retention_scenarios", [])[:3]):
+        bg = scenario_bgs[si]
+        locked_sc = is_free and si > 0
+        if locked_sc:
+            cl(ws, row, 1, f"🔒 {sc.get('label','')}", italic=True, color=LOCK_FG, bg=LOCK_BG)
+            for c in range(2, 5): _lock(ws, row, c, "🔒")
         else:
-            cl(ws, row, 1, comp.get("name", ""),     bold=True, bg=bg, color="1a3a2a")
-            cl(ws, row, 2, comp.get("industry", ""), bg=bg)
-            cl(ws, row, 3, comp.get("size", ""),     bg=bg, align="center")
-            cl(ws, row, 4, comp.get("why_now", ""),  bg=bg)
+            cl(ws, row, 1, sc.get("label", ""), bold=True, bg=bg, color=A_DARK)
+            cl(ws, row, 2, sc.get("alumni_retained", 0), bg=bg, align="center")
+            c3 = cl(ws, row, 3, sc.get("monthly_recurring_revenue", 0), bg=bg, align="right"); money_fmt(c3)
+            c4 = cl(ws, row, 4, sc.get("annual_recurring_revenue", 0),  bg=bg, align="right", bold=True); money_fmt(c4)
+        rh(ws, row, 40); row += 1
+
+    cw(ws, 1, 32); cw(ws, 2, 20); cw(ws, 3, 24); cw(ws, 4, 24)
+
+
+def build_a_organic_sheet(ws, data, is_free=False):
+    """Sheet 3: Organic acquisition engine."""
+    og = data.get("organic_engine", {})
+    lm = og.get("lead_magnet", {})
+    ref = og.get("referral_activation", {})
+
+    section_header(ws, 1, "📣  ORGANIC ACQUISITION ENGINE — REDUCE AD DEPENDENCE", span=5, bg=A_DARK)
+    ws.merge_cells("A2:E2")
+    cl(ws, 2, 1, og.get("why_organic_matters", ""), italic=True, bg=A_LIGHT, color=A_DARK, size=10)
+    rh(ws, 2, 28)
+    ws.merge_cells("A3:E3")
+    cl(ws, 3, 1, f"Current dependency: {og.get('current_acquisition_dependency','')}", bold=True, bg="FFE4E1", color="C00000", size=10)
+    rh(ws, 3, 28)
+
+    # Lead magnet
+    row = 5
+    section_header(ws, row, "🎁  LEAD MAGNET — PRE-QUALIFY COHORT BUYERS", span=5, bg=A_MID)
+    row += 1
+    lm_rows = [
+        ("NAME",              lm.get("name", ""),             False),
+        ("FORMAT",            lm.get("format", ""),           False),
+        ("WHAT IT DOES",      lm.get("what_it_does", ""),     False),
+        ("HOW IT PRE-QUALIFIES", lm.get("how_it_pre_qualifies", ""), False),
+        ("CTA",               lm.get("cta", ""),              is_free),
+    ]
+    for label, val, locked in lm_rows:
+        cl(ws, row, 1, label, bold=True, bg=A_LIGHT, color=A_DARK, size=9)
+        ws.merge_cells(f"B{row}:E{row}")
+        if locked:
+            cl(ws, row, 2, _tease(val, 70), italic=True, color=LOCK_FG, bg=LOCK_BG, size=9)
+        else:
+            cl(ws, row, 2, val, bg=A_ACCENT, size=9)
         rh(ws, row, 45); row += 1
 
-    cw(ws, 1, 26); cw(ws, 2, 30); cw(ws, 3, 18); cw(ws, 4, 40)
+    # Referral activation
+    row += 1
+    section_header(ws, row, "🔁  REFERRAL ACTIVATION SCRIPT", span=5, bg=A_MID)
+    row += 1
+    ref_rows = [
+        ("TIMING",    ref.get("timing", ""),    False),
+        ("INCENTIVE", ref.get("incentive", ""), False),
+        ("SCRIPT",    ref.get("script", ""),    is_free),
+    ]
+    for label, val, locked in ref_rows:
+        cl(ws, row, 1, label, bold=True, bg=A_LIGHT, color=A_DARK, size=9)
+        ws.merge_cells(f"B{row}:E{row}")
+        if locked:
+            cl(ws, row, 2, _tease(val, 70), italic=True, color=LOCK_FG, bg=LOCK_BG, size=9)
+        else:
+            cl(ws, row, 2, val, bg=A_ACCENT, size=9)
+        rh(ws, row, 55); row += 1
+
+    # Content pillars
+    row += 1
+    section_header(ws, row, "📌  CONTENT PILLARS — ATTRACT COHORT BUYERS ORGANICALLY", span=5, bg=A_MID)
+    row += 1
+    for pi, pillar in enumerate(og.get("content_pillars", [])):
+        bg_p = A_LIGHT if pi % 2 == 0 else "FFFFFF"
+        cl(ws, row, 1, pillar.get("pillar", ""), bold=True, bg=A_LIGHT, color=A_DARK, size=9)
+        ws.merge_cells(f"B{row}:C{row}")
+        cl(ws, row, 2, f"Why it works: {pillar.get('why_it_attracts_cohort_buyers','')}", bg=bg_p, size=9)
+        ws.merge_cells(f"D{row}:E{row}")
+        cl(ws, row, 4, "\n".join(f"▸ {h}" for h in pillar.get("hooks", [])), bg=bg_p, size=9, color=A_DARK)
+        rh(ws, row, 60); row += 1
+
+        post = pillar.get("sample_post", "")
+        cl(ws, row, 1, "SAMPLE POST", bold=True, bg=A_LIGHT, color=A_DARK, size=9)
+        ws.merge_cells(f"B{row}:E{row}")
+        if is_free:
+            cl(ws, row, 2, (post[:90]+"…  🔒") if len(post)>90 else post+"  🔒",
+               italic=True, color=LOCK_FG, bg=LOCK_BG, size=9)
+            rh(ws, row, 40)
+        else:
+            cl(ws, row, 2, post, bg=bg_p, size=9)
+            rh(ws, row, max(80, min(220, len(post)//2)))
+        row += 1
+
+    # 2-week calendar
+    row += 1
+    section_header(ws, row, "📅  2-WEEK POSTING CALENDAR", span=5, bg=A_MID)
+    row += 1
+    col_headers(ws, row, ["DAY", "FORMAT", "PILLAR", "HOOK", "CTA"], bg=A_MID)
+    row += 1
+    for entry in og.get("two_week_calendar", []):
+        bg = A_LIGHT if row % 2 == 0 else "FFFFFF"
+        cl(ws, row, 1, entry.get("day", ""),    bold=True, bg=A_LIGHT, color=A_DARK, size=9)
+        cl(ws, row, 2, entry.get("format", ""), bg=bg, size=9)
+        cl(ws, row, 3, entry.get("pillar", ""), bg=bg, size=9)
+        cl(ws, row, 4, entry.get("hook", ""),   bg=bg, size=9)
+        cl(ws, row, 5, entry.get("cta", ""),    bg=bg, size=9)
+        rh(ws, row, 40); row += 1
+
+    # Quick wins
+    row += 1
+    section_header(ws, row, "⚡  QUICK WINS — DO IN 48 HRS", span=5, bg=A_MID)
+    row += 1
+    for qi, win in enumerate(og.get("quick_wins", []), 1):
+        cl(ws, row, 1, f"#{qi}", bold=True, bg=A_LIGHT, color=A_DARK, size=9, align="center")
+        ws.merge_cells(f"B{row}:E{row}")
+        if is_free and qi > 1:
+            cl(ws, row, 2, _tease(win, 65), italic=True, color=LOCK_FG, bg=LOCK_BG, size=9)
+        else:
+            cl(ws, row, 2, win, bg=A_ACCENT, size=9)
+        rh(ws, row, 45); row += 1
+
+    cw(ws, 1, 22); cw(ws, 2, 24); cw(ws, 3, 22); cw(ws, 4, 30); cw(ws, 5, 22)
 
 
-def build_a_speaking_sheet(ws, data, is_free=False):
-    ss = data.get("speaking_strategy", {})
-    section_header(ws, 1, "SPEAKING STRATEGY", span=2, bg="1a3a2a")
+def build_a_waitlist_sheet(ws, data, is_free=False):
+    """Sheet 4: Waitlist system to pre-fill next cohort."""
+    wl = data.get("waitlist_system", {})
+    section_header(ws, 1, "⏳  WAITLIST SYSTEM — FILL NEXT COHORT BEFORE THIS ONE ENDS", span=2, bg=A_DARK)
 
     meta_rows = [
-        ("TALK TITLE",             ss.get("talk_title", ""),           False),
-        ("THE TENSION",            ss.get("the_tension", ""),          False),
-        ("AUDIENCE PAIN",          ss.get("audience_pain", ""),        False),
-        ("FEE BENCHMARK",          ss.get("fee_benchmark_note", ""),   is_free),
-        ("BACK-OF-ROOM OFFER",     ss.get("back_of_room_offer", ""),   is_free),
-        ("FIRST OUTREACH ACTION",  ss.get("first_outreach_action", ""), is_free),
+        ("HOW IT WORKS",                  wl.get("how_it_works", ""),                    False),
+        ("WAITLIST OFFER",                 wl.get("waitlist_offer", ""),                  False),
+        ("CTA INSIDE COHORT",             wl.get("waitlist_cta_inside_cohort", ""),       is_free),
+        ("TARGET FILL SPLIT",             wl.get("target_fill_split", ""),               False),
+        ("MILESTONE",                     wl.get("milestone", ""),                        False),
     ]
     row = 3
     for label, val, locked in meta_rows:
-        cl(ws, row, 1, label, bold=True, bg="D9E1F2", color="1a3a2a")
+        cl(ws, row, 1, label, bold=True, bg=A_LIGHT, color=A_DARK, size=10)
         if locked:
-            _lock(ws, row, 2, _tease(val, keep=55))
+            _lock(ws, row, 2, _tease(val, 65))
         else:
-            cl(ws, row, 2, val, bg="F0FFF4")
-        rh(ws, row, 50); row += 1
+            cl(ws, row, 2, val, bg=A_ACCENT, size=10)
+        rh(ws, row, 55); row += 1
 
+    # Nurture email sequence
     row += 1
-    section_header(ws, row, "3 EVENT TYPES TO TARGET", span=4, bg="2d6648")
+    section_header(ws, row, "📧  WAITLIST NURTURE EMAIL SEQUENCE", span=2, bg=A_MID)
     row += 1
-    col_headers(ws, row, ["EVENT TYPE", "BOOKING PATH", "FEE RANGE", "NOTES"], bg="2d6648")
-    row += 1
-    for ei, evt in enumerate(ss.get("event_types", [])[:3]):
-        bg = "EAF3ED" if ei % 2 == 0 else "FFFFFF"
-        if is_free:
-            cl(ws, row, 1, evt.get("type", ""), bold=True, bg=bg, color="1a3a2a")
-            for c in range(2, 5): _lock(ws, row, c)
+    for ei, email in enumerate(wl.get("waitlist_nurture_emails", [])[:3]):
+        locked_email = is_free and ei > 0
+        section_header(ws, row, f"EMAIL {ei+1} — {email.get('subject','')}", span=2,
+                       bg=LOCK_FG if locked_email else A_MID)
+        row += 1
+        email_rows = [
+            ("SUBJECT", email.get("subject", ""), False),
+            ("BODY",    email.get("body", ""),    locked_email),
+            ("CTA",     email.get("cta", ""),     locked_email),
+        ]
+        for label, val, locked in email_rows:
+            cl(ws, row, 1, label, bold=True, bg=A_LIGHT, color=A_DARK, size=9)
+            if locked:
+                _lock(ws, row, 2, _tease(val, 70))
+            else:
+                cl(ws, row, 2, val, bg=A_ACCENT, size=9)
+            rh(ws, row, 60); row += 1
+        row += 1
+
+    cw(ws, 1, 30); cw(ws, 2, 72)
+
+
+def build_a_revenue_sheet(ws, data, is_free=False):
+    """Sheet 5: Revenue scenarios — before and after the system."""
+    rs = data.get("revenue_scenarios", {})
+    s1 = rs.get("scenario_current", {})
+    s2 = rs.get("scenario_add_continuity", {})
+    s3 = rs.get("scenario_full_system", {})
+
+    section_header(ws, 1, "📊  REVENUE SCENARIOS — WHAT THE SYSTEM IS WORTH", span=4, bg=A_DARK)
+    col_headers(ws, 3, ["METRIC", "CURRENT STATE", "ADD CONTINUITY", "FULL SYSTEM (YR 2)"], bg=A_MID)
+
+    rows_data = [
+        ("LABEL",               s1.get("label",""), s2.get("label",""), s3.get("label","")),
+        ("ANNUAL COHORT REVENUE", s1.get("annual_cohort_revenue",0), s2.get("annual_cohort_revenue",0), s3.get("annual_cohort_revenue",0)),
+        ("ANNUAL AD SPEND",       s1.get("annual_ad_spend",0),       s2.get("annual_ad_spend",0),       s3.get("annual_ad_spend",0)),
+        ("ALUMNI MRR × 12",       s1.get("alumni_mrr",0)*12,         s2.get("alumni_mrr",0)*12,         s3.get("alumni_mrr",0)*12),
+        ("ANNUAL NET REVENUE",    s1.get("annual_net_revenue",0),    s2.get("annual_net_revenue",0),    s3.get("annual_net_revenue",0)),
+        ("HOURS/WEEK",            s1.get("hours_per_week",0),        s2.get("hours_per_week",0),        s3.get("hours_per_week",0)),
+        ("NOTES",                 s1.get("note",""),                 s2.get("note",""),                 s3.get("note","")),
+    ]
+    for ri, (label, v1, v2, v3) in enumerate(rows_data, 4):
+        is_money = "REVENUE" in label or "SPEND" in label or "MRR" in label
+        locked_s3 = is_free and label not in ("LABEL", "ANNUAL COHORT REVENUE")
+        cl(ws, ri, 1, label, bold=True, bg=A_LIGHT, color=A_DARK)
+        c2 = cl(ws, ri, 2, v1, bg=A_ACCENT, bold=(label == "ANNUAL NET REVENUE"))
+        if is_money and isinstance(v1, int): money_fmt(c2)
+        c3 = cl(ws, ri, 3, v2, bg="D1FAE5", bold=(label == "ANNUAL NET REVENUE"))
+        if is_money and isinstance(v2, int): money_fmt(c3)
+        if locked_s3:
+            _lock(ws, ri, 4, "🔒 [Full Plan Only]")
         else:
-            cl(ws, row, 1, evt.get("type", ""),         bold=True, bg=bg, color="1a3a2a")
-            cl(ws, row, 2, evt.get("booking_path", ""), bg=bg)
-            cl(ws, row, 3, evt.get("fee_range", ""),    bg=bg, align="center")
-            cl(ws, row, 4, evt.get("notes", ""),        bg=bg)
-        rh(ws, row, 45); row += 1
+            c4 = cl(ws, ri, 4, v3, bg="FEF9C3", bold=(label == "ANNUAL NET REVENUE"))
+            if is_money and isinstance(v3, int): money_fmt(c4)
+        rh(ws, ri, 50)
 
-    cw(ws, 1, 26); cw(ws, 2, 36); cw(ws, 3, 18); cw(ws, 4, 40)
+    cw(ws, 1, 26); cw(ws, 2, 30); cw(ws, 3, 34); cw(ws, 4, 34)
 
 
 def build_a_action_sheet(ws, data, is_free=False):
-    section_header(ws, 1, "90-DAY EXPANSION PLAN", span=5, bg="1a3a2a")
-    col_headers(ws, 3, ["WEEK", "PHASE", "FOCUS", "ACTIONS", "MILESTONE"], bg="2d6648")
-    phase_colors = ["2d6648", "3a8a5a", "4db870"]
+    """Sheet 6: 90-day action plan."""
+    section_header(ws, 1, "📅  YOUR 90-DAY COHORT GROWTH PLAN", span=5, bg=A_DARK)
+    col_headers(ws, 3, ["WEEK", "PHASE", "FOCUS", "ACTIONS", "MILESTONE"], bg=A_MID)
+    phase_colors = [A_DARK, A_MID, "2E5B8A", "1F6B45", "7B2D00"]
     action_plan = data.get("action_plan", [])
 
     for ri, item in enumerate(action_plan, 4):
         idx    = ri - 4
-        locked = is_free and idx >= 1
-        bg_ph  = phase_colors[idx] if idx < len(phase_colors) else "2d6648"
+        locked = is_free and idx >= 2
+        bg_ph  = phase_colors[idx] if idx < len(phase_colors) else A_MID
 
-        cl(ws, ri, 1, item.get("week", ""),    bold=True, bg=bg_ph, color="FFFFFF")
-        cl(ws, ri, 2, item.get("phase", ""),   bold=True, bg="EAF3ED", color="1a3a2a")
+        cl(ws, ri, 1, item.get("week", ""),  bold=True, bg=bg_ph, color="FFFFFF")
+        cl(ws, ri, 2, item.get("phase", ""), bold=True, bg=A_LIGHT, color=A_DARK)
 
         if locked:
-            _lock(ws, ri, 3, "🔒 [Unlock Strategy]")
+            _lock(ws, ri, 3, "🔒 [Unlock Growth Strategy]")
             _lock(ws, ri, 4, _tease(item.get("actions", ""), keep=55))
             _lock(ws, ri, 5, _tease(item.get("milestone", ""), keep=30))
         else:
-            cl(ws, ri, 3, item.get("focus", ""),     bold=True, bg="F0FFF4")
-            cl(ws, ri, 4, item.get("actions", ""))
-            cl(ws, ri, 5, item.get("milestone", ""), italic=True, color="1a3a2a", bg="EAF3ED")
+            cl(ws, ri, 3, item.get("focus", ""),     bold=True, bg=A_ACCENT)
+            cl(ws, ri, 4, item.get("actions", ""),   bg="FFFFFF")
+            cl(ws, ri, 5, item.get("milestone", ""), italic=True, color=A_DARK, bg=A_LIGHT)
 
         rh(ws, ri, 70)
 
     legend_row = 4 + len(action_plan) + 1
     ws.merge_cells(f"A{legend_row}:E{legend_row}")
-    cl(ws, legend_row, 1,
-       "Weeks 1–4 are fully unlocked.  🔒 Weeks 5–12 are in the Full Plan.",
-       italic=True, bg="EAF3ED", color="1a3a2a", size=9)
+    cl(ws, legend_row, 1, "Weeks 1–4 fully visible.  🔒 Weeks 5–12 unlocked in the Full Plan.",
+       italic=True, bg=A_LIGHT, color=A_DARK, size=9)
     rh(ws, legend_row, 18)
-    cw(ws, 1, 14); cw(ws, 2, 22); cw(ws, 3, 26); cw(ws, 4, 44); cw(ws, 5, 30)
+    cw(ws, 1, 14); cw(ws, 2, 22); cw(ws, 3, 28); cw(ws, 4, 44); cw(ws, 5, 30)
 
 
 def build_a_fear_sheet(ws, data, is_free=False):
-    section_header(ws, 1, "YOUR FEAR REFRAME", span=2, bg="1a3a2a")
+    section_header(ws, 1, "😨  YOUR FEAR ABOUT CHANGING WHAT'S WORKING — REFRAMED", span=2, bg=A_DARK)
     fear = data.get("fear_reframe", {})
     rows = [
         ("THE FEAR",           fear.get("fear", ""),     "C00000", "FFE0E0", False),
-        ("THE REAL TRUTH",     fear.get("truth", ""),    "1a3a2a", "EAF3ED", is_free),
-        ("ACTION THIS WEEK 1", fear.get("action_1", ""), "2d6648", "F0FFF4", is_free),
-        ("ACTION THIS WEEK 2", fear.get("action_2", ""), "2d6648", "F0FFF4", is_free),
-        ("ACTION THIS WEEK 3", fear.get("action_3", ""), "2d6648", "F0FFF4", is_free),
+        ("THE REAL TRUTH",     fear.get("truth", ""),    A_DARK,   A_LIGHT,  is_free),
+        ("ACTION THIS WEEK 1", fear.get("action_1", ""), A_MID,    A_ACCENT, is_free),
+        ("ACTION THIS WEEK 2", fear.get("action_2", ""), A_MID,    A_ACCENT, is_free),
+        ("ACTION THIS WEEK 3", fear.get("action_3", ""), A_MID,    A_ACCENT, is_free),
     ]
     for ri, (label, val, label_color, val_bg, locked) in enumerate(rows, 3):
-        cl(ws, ri, 1, label, bold=True, bg="D9E1F2", color=label_color, size=11)
+        cl(ws, ri, 1, label, bold=True, bg=A_LIGHT, color=label_color, size=11)
         if locked:
             cl(ws, ri, 2, _tease(val, keep=55), italic=True, color=LOCK_FG, bg=LOCK_BG, size=11)
         else:
@@ -1479,44 +1795,50 @@ def build_a_fear_sheet(ws, data, is_free=False):
 
 
 def build_a_upgrade_sheet(ws, payment_url: str = ""):
-    section_header(ws, 1, "🔒 UNLOCK YOUR FULL EXPANSION PLAN", span=2, bg="1a3a2a")
+    section_header(ws, 1, "🔒  UNLOCK YOUR FULL COHORT GROWTH PLAN", span=2, bg=A_DARK)
     locked_sections = [
-        ("📊 Revenue Ceiling — Corporate Comparison",
-         "How much one corporate engagement is worth vs. one month of 1:1 coaching."),
-        ("🏢 Corporate Offer — Buyer Title & Buying Trigger",
-         "The exact job title with budget authority and the signal that tells you they're ready NOW."),
-        ("🏢 Corporate Offer — Pricing Logic & 3 Target Companies",
-         "How to anchor your price to cost-avoided, plus three real companies to approach this month."),
-        ("🏢 Corporate Offer — Outreach One-Liner",
-         "The exact first sentence of your cold email — written in their language, not yours."),
-        ("🎤 Speaking — Fee Benchmarks & Event Targets",
-         "What corporate all-hands actually pay vs. conference fees."),
-        ("🎤 Speaking — Back-of-Room Offer & First Outreach Action",
-         "How the talk becomes the top of your corporate funnel."),
+        ("🔍 Cohort Audit — What You Don't See Yet",
+         "The hidden cost of your reset cycle — exactly what it's costing you per year."),
+        ("🔁 Alumni Continuity — Pitch Script",
+         "Word-for-word script to deliver in the final week of your cohort to convert graduates."),
+        ("🔁 Alumni Continuity — Retention Scenarios 2 & 3",
+         "What 50% and 70% alumni retention looks like as monthly and annual recurring revenue."),
+        ("📣 Organic Engine — Referral Activation Script",
+         "Exact words to activate referrals from current and past clients without feeling salesy."),
+        ("📣 Organic Engine — Sample Posts (Full)",
+         "3 full publish-ready posts for your existing channels, ready to copy and post."),
+        ("📣 Organic Engine — Quick Wins 2 & 3",
+         "The two highest-leverage actions to start your organic engine this week."),
+        ("⏳ Waitlist System — CTA Inside Cohort",
+         "Exact language to use inside your current cohort to build the waitlist for the next one."),
+        ("⏳ Waitlist System — Nurture Emails 2 & 3",
+         "The follow-up emails that keep waitlist leads warm until the next cohort opens."),
+        ("📊 Revenue Scenarios — Full System (Year 2)",
+         "What organic engine + waitlist + continuity looks like compounded over 12 months."),
         ("📅 90-Day Plan — Weeks 5–12",
-         "The warm outreach sequence, pilot offer structure, and first engagement close."),
+         "Waitlist activation, first alumni continuity cohort, and the compound growth phase."),
         ("😨 Fear Reframe (Full)",
-         "The real truth behind your fear about going corporate + 3 specific actions."),
+         "The real truth + 3 specific actions to take this week."),
     ]
     for ri, (label, desc) in enumerate(locked_sections, 3):
-        cl(ws, ri, 1, f"🔒  {label}", bold=True, bg="D9E1F2", color="1a3a2a", size=11)
-        cl(ws, ri, 2, f"{desc}\n\n➡  Unlock in the Full Expansion Plan.", bg="FFF8E7", color="856404")
+        cl(ws, ri, 1, f"🔒  {label}", bold=True, bg=A_LIGHT, color=A_DARK, size=11)
+        cl(ws, ri, 2, f"{desc}\n\n➡  Unlock in the Full Cohort Growth Plan.", bg="FFF8E7", color="856404")
         rh(ws, ri, 70)
 
     cta_row = 3 + len(locked_sections) + 1
     ws.merge_cells(f"A{cta_row}:B{cta_row}")
     cl(ws, cta_row, 1,
-       "✨  UNLOCK YOUR FULL EXPANSION PLAN  ✨\n\n"
-       "You can see your Revenue Ceiling and the shape of your Corporate Offer.\n"
-       "The full plan gives you the exact buyer, buying trigger, pricing logic,\n"
-       "3 target companies, the outreach email, and your complete 90-day roadmap.",
-       bold=True, bg="1a3a2a", color="FFFFFF", size=12)
+       "✨  UNLOCK YOUR FULL COHORT GROWTH PLAN  ✨\n\n"
+       "You've seen your leak diagnosis and the shape of the three fixes.\n"
+       "The full plan gives you the pitch script, referral activation, waitlist emails,\n"
+       "and your complete 90-day roadmap to a self-filling cohort.",
+       bold=True, bg=A_DARK, color="FFFFFF", size=12)
     rh(ws, cta_row, 120)
 
     link_row = cta_row + 1
     ws.merge_cells(f"A{link_row}:B{link_row}")
-    tag_cell = cl(ws, link_row, 1, "👉  CLICK HERE TO UNLOCK YOUR FULL PLAN  →",
-                  bold=True, bg="FFD700", color="1a3a2a", size=14, align="center")
+    tag_cell = cl(ws, link_row, 1, "👉  CLICK HERE TO UNLOCK YOUR FULL COHORT GROWTH PLAN  →",
+                  bold=True, bg=A_GOLD, color=A_DARK, size=14, align="center")
     if payment_url:
         tag_cell.hyperlink = payment_url
     rh(ws, link_row, 40)
@@ -2194,16 +2516,14 @@ def build_excel(data: dict, file_path: str):
         wb.create_sheet("😨 Fear Reframe");         build_c_fear_sheet(wb["😨 Fear Reframe"], data, is_free=False)
 
     elif path == "A":
-        ws1 = wb.active; ws1.title = "📊 Revenue Ceiling"
-        build_a_revenue_ceiling_sheet(ws1, data, is_free=False)
-        ws2 = wb.create_sheet("🏢 Corporate Offer")
-        build_a_corporate_offer_sheet(ws2, data, is_free=False)
-        ws3 = wb.create_sheet("🎤 Speaking Strategy")
-        build_a_speaking_sheet(ws3, data, is_free=False)
-        ws4 = wb.create_sheet("📅 90-Day Expansion")
-        build_a_action_sheet(ws4, data, is_free=False)
-        ws5 = wb.create_sheet("😨 Fear Reframe")
-        build_a_fear_sheet(ws5, data, is_free=False)
+        ws1 = wb.active; ws1.title = "🔍 Cohort Audit"
+        build_a_audit_sheet(ws1, data, is_free=False)
+        wb.create_sheet("🔁 Alumni Continuity"); build_a_continuity_sheet(wb["🔁 Alumni Continuity"], data, is_free=False)
+        wb.create_sheet("📣 Organic Engine");    build_a_organic_sheet(wb["📣 Organic Engine"], data, is_free=False)
+        wb.create_sheet("⏳ Waitlist System");   build_a_waitlist_sheet(wb["⏳ Waitlist System"], data, is_free=False)
+        wb.create_sheet("📊 Revenue Scenarios"); build_a_revenue_sheet(wb["📊 Revenue Scenarios"], data, is_free=False)
+        wb.create_sheet("📅 90-Day Plan");       build_a_action_sheet(wb["📅 90-Day Plan"], data, is_free=False)
+        wb.create_sheet("😨 Fear Reframe");      build_a_fear_sheet(wb["😨 Fear Reframe"], data, is_free=False)
 
     else:  # Path B
         ws1 = wb.active; ws1.title = "Your Offer"
@@ -2239,16 +2559,14 @@ def build_free_excel(data: dict, file_path: str, payment_url: str = ""):
         build_c_upgrade_sheet(ws_cta, payment_url)
 
     elif path == "A":
-        ws1 = wb.active; ws1.title = "📊 Revenue Ceiling"
-        build_a_revenue_ceiling_sheet(ws1, data, is_free=True)
-        ws2 = wb.create_sheet("🏢 Corporate Offer")
-        build_a_corporate_offer_sheet(ws2, data, is_free=True)
-        ws3 = wb.create_sheet("🎤 Speaking Strategy")
-        build_a_speaking_sheet(ws3, data, is_free=True)
-        ws4 = wb.create_sheet("📅 90-Day Expansion")
-        build_a_action_sheet(ws4, data, is_free=True)
-        ws5 = wb.create_sheet("😨 Fear Reframe")
-        build_a_fear_sheet(ws5, data, is_free=True)
+        ws1 = wb.active; ws1.title = "🔍 Cohort Audit"
+        build_a_audit_sheet(ws1, data, is_free=True)
+        wb.create_sheet("🔁 Alumni Continuity"); build_a_continuity_sheet(wb["🔁 Alumni Continuity"], data, is_free=True)
+        wb.create_sheet("📣 Organic Engine");    build_a_organic_sheet(wb["📣 Organic Engine"], data, is_free=True)
+        wb.create_sheet("⏳ Waitlist System");   build_a_waitlist_sheet(wb["⏳ Waitlist System"], data, is_free=True)
+        wb.create_sheet("📊 Revenue Scenarios"); build_a_revenue_sheet(wb["📊 Revenue Scenarios"], data, is_free=True)
+        wb.create_sheet("📅 90-Day Plan");       build_a_action_sheet(wb["📅 90-Day Plan"], data, is_free=True)
+        wb.create_sheet("😨 Fear Reframe");      build_a_fear_sheet(wb["😨 Fear Reframe"], data, is_free=True)
         ws_cta = wb.create_sheet("🔒 Unlock Full Plan")
         build_a_upgrade_sheet(ws_cta, payment_url)
 
