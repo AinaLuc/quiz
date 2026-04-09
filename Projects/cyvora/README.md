@@ -35,6 +35,8 @@ Variables requises:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `RETELL_API_KEY`
+- `RETELL_INBOUND_COMPANY_ID`
+- `RETELL_INBOUND_AGENT_ID` (optionnel)
 - `VAPI_WEBHOOK_SECRET`
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
@@ -143,6 +145,8 @@ Important:
 
 - Retell demande le corps brut pour vérifier la signature.
 - Selon la documentation Retell, il faut utiliser une API key avec badge webhook pour la vérification.
+- Pour les appels entrants, vous pouvez configurer le numéro Retell avec un `Inbound Call Webhook URL` vers `https://votre-domaine.com/api/retell/inbound`.
+- Cette route renvoie `call_inbound.metadata.companyId` à partir de `RETELL_INBOUND_COMPANY_ID`.
 - Le sélecteur de numéros dans le dashboard est encore branché sur Vapi. Cette mise à jour ajoute le webhook Retell, pas encore la gestion des numéros Retell.
 
 ## 6. Connecter Stripe
