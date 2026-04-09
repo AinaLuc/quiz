@@ -1,19 +1,25 @@
 import { NextResponse } from "next/server";
+import { verifyRetellRequest } from "@/lib/retell";
+import { resolveInboundRetellConfig } from "@/lib/retell-inbound-config";
 
-function readRequiredEnv(name) {
-  const value = process.env[name];
-
-  if (!value || value.startsWith("replace-with-")) {
-    throw new Error(`Missing ${name}.`);
-  }
-
-  return value;
-}
-
-export async function POST() {
+export async function POST(request) {
   try {
-    const companyId = readRequiredEnv("RETELL_INBOUND_COMPANY_ID");
-    const agentId = process.env.RETELL_INBOUND_AGENT_ID || null;
+    const rawBody = await request.text();
+
+    if (!(await verifyRetellRequest(rawBody, request.headers.get("x-retell-signature")))) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    let payload;
+
+    try {
+      payload = JSON.parse(rawBody || "{}");
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON payload." }, { status: 400 });
+    }
+
+    const toNumber = payload?.call_inbound?.to_number;
+    const { companyId, agentId } = resolveInboundRetellConfig(toNumber);
 
     return NextResponse.json({
       call_inbound: {

@@ -24,7 +24,7 @@ async function findDefaultCompanyId(supabase) {
 export async function POST(request) {
   const rawBody = await request.text();
 
-  if (!verifyRetellRequest(rawBody, request.headers.get("x-retell-signature"))) {
+  if (!(await verifyRetellRequest(rawBody, request.headers.get("x-retell-signature")))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

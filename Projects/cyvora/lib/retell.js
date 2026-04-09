@@ -1,4 +1,4 @@
-import crypto from "node:crypto";
+import { verify as verifyRetellWebhook } from "retell-sdk/lib/webhook_auth";
 
 function toIsoDate(value) {
   if (!value && value !== 0) {
@@ -19,54 +19,18 @@ function isPlaceholder(value) {
   return typeof value === "string" && value.startsWith("replace-with-");
 }
 
-function parseSignature(headerValue) {
-  if (!headerValue) {
-    return null;
-  }
-
-  const match = /^v=(\d+),d=([a-fA-F0-9]+)$/.exec(headerValue.trim());
-  if (!match) {
-    return null;
-  }
-
-  return {
-    timestamp: match[1],
-    digest: match[2].toLowerCase(),
-  };
-}
-
-export function verifyRetellRequest(rawBody, signatureHeader) {
+export async function verifyRetellRequest(rawBody, signatureHeader) {
   const apiKey = process.env.RETELL_API_KEY;
 
   if (!apiKey || isPlaceholder(apiKey)) {
     return true;
   }
 
-  const signature = parseSignature(signatureHeader);
-
-  if (!signature) {
+  if (!signatureHeader) {
     return false;
   }
 
-  const now = Date.now();
-  const timestamp = Number(signature.timestamp);
-
-  if (!Number.isFinite(timestamp) || Math.abs(now - timestamp) > 5 * 60 * 1000) {
-    return false;
-  }
-
-  const digest = crypto
-    .createHmac("sha256", apiKey)
-    .update(`${rawBody}${signature.timestamp}`, "utf8")
-    .digest("hex");
-  const expectedBuffer = Buffer.from(digest, "hex");
-  const receivedBuffer = Buffer.from(signature.digest, "hex");
-
-  if (expectedBuffer.length !== receivedBuffer.length) {
-    return false;
-  }
-
-  return crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
+  return verifyRetellWebhook(rawBody, apiKey, signatureHeader);
 }
 
 export function extractRetellCallPayload(payload) {
