@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { ActionSubmitButton } from "@/components/action-submit-button";
+import { RetellDebugConsole } from "@/components/retell-debug-console";
 import { SiteHeader } from "@/components/site-header";
 import { UpgradeForm } from "@/components/upgrade-form";
 import { assignTransferNumber, releaseTransferNumber, sendTrialLifecycleTest } from "@/app/actions";
@@ -7,6 +8,7 @@ import { getDisplayName, getTrialWindow } from "@/lib/auth";
 import { formatIncludedMinutes, getBillingPlan } from "@/lib/billing-config";
 import { ensureProfileRecords } from "@/lib/profile";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { findInboundNumberForCompany } from "@/lib/retell-inbound-config";
 import { createClient } from "@/lib/supabase/server";
 import { listVapiPhoneNumbers } from "@/lib/vapi-management";
 
@@ -151,7 +153,6 @@ export default async function DashboardPage({ searchParams }) {
 
   const todayStart = getTodayStartIso();
   const currentMonthStart = getCurrentMonthStartIso();
-  const retellInboundNumber = process.env.RETELL_INBOUND_PHONE_NUMBER || null;
   const trial = getTrialWindow(
     company?.trial_started_at || user.user_metadata?.trial_started_at || user.created_at,
   );
@@ -232,6 +233,7 @@ export default async function DashboardPage({ searchParams }) {
     currentPage * numbersPageSize,
   );
 
+  const retellInboundNumber = findInboundNumberForCompany(profile?.company_id || null);
   const selectedNumber = companyAssignment
     ? availableNumbers.find((phoneNumber) => phoneNumber.id === companyAssignment.vapi_phone_number_id) ||
       null
@@ -276,6 +278,8 @@ export default async function DashboardPage({ searchParams }) {
       <SiteHeader session={{ user }} />
 
       <main className="dashboard-main">
+        <RetellDebugConsole calls={latestCalls || []} />
+
         <section className="dashboard-hero panel">
           <div>
             <p className="eyebrow">Opérations</p>
