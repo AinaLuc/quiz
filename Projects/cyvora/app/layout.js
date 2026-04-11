@@ -1,9 +1,9 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Cyvora | IA réceptionniste HVAC au Québec",
+  title: "Cyvora | IA réceptionniste CVAC au Québec",
   description:
-    "Cyvora aide les entreprises HVAC du Québec à répondre aux appels, planifier les rendez-vous et convertir plus de demandes grâce à l'IA.",
+    "Cyvora aide les entreprises CVAC du Québec à répondre aux appels, planifier les rendez-vous et convertir plus de demandes grâce à l'IA.",
 };
 
 export default function RootLayout({ children }) {
