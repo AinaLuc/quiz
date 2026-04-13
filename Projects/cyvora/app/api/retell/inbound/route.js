@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyRetellRequest } from "@/lib/retell";
-import { resolveInboundRetellConfig } from "@/lib/retell-inbound-config";
+import { normalizePhoneNumber, resolveInboundRetellConfig } from "@/lib/retell-inbound-config";
 
 export async function POST(request) {
   try {
@@ -19,6 +20,27 @@ export async function POST(request) {
     }
 
     const toNumber = payload?.call_inbound?.to_number;
+    const supabase = createAdminClient();
+    const normalizedToNumber = normalizePhoneNumber(toNumber);
+    const { data: assignment } = normalizedToNumber
+      ? await supabase
+          .from("retell_phone_assignments")
+          .select("company_id, inbound_agent_id")
+          .eq("phone_number", normalizedToNumber)
+          .maybeSingle()
+      : { data: null };
+
+    if (assignment?.company_id) {
+      return NextResponse.json({
+        call_inbound: {
+          ...(assignment.inbound_agent_id ? { override_agent_id: assignment.inbound_agent_id } : {}),
+          metadata: {
+            companyId: assignment.company_id,
+          },
+        },
+      });
+    }
+
     const { companyId, agentId } = resolveInboundRetellConfig(toNumber);
 
     return NextResponse.json({

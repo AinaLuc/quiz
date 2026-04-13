@@ -3,14 +3,14 @@ import { ActionSubmitButton } from "@/components/action-submit-button";
 import { RetellDebugConsole } from "@/components/retell-debug-console";
 import { SiteHeader } from "@/components/site-header";
 import { UpgradeForm } from "@/components/upgrade-form";
-import { assignTransferNumber, releaseTransferNumber, sendTrialLifecycleTest } from "@/app/actions";
+import { assignRetellNumber, releaseRetellNumber, sendTrialLifecycleTest } from "@/app/actions";
 import { getDisplayName, getTrialWindow } from "@/lib/auth";
 import { formatIncludedMinutes, getBillingPlan } from "@/lib/billing-config";
 import { ensureProfileRecords } from "@/lib/profile";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { findInboundNumberForCompany } from "@/lib/retell-inbound-config";
+import { listRetellPhoneNumbers } from "@/lib/retell-management";
 import { createClient } from "@/lib/supabase/server";
-import { listVapiPhoneNumbers } from "@/lib/vapi-management";
 
 function getTodayStartIso() {
   const now = new Date();
@@ -59,16 +59,16 @@ function getCurrentMonthStartIso() {
 
 function formatSetupError(error) {
   switch (error) {
-    case "missing_vapi_number":
-      return "Choisissez un numéro Vapi avant de continuer.";
+    case "missing_retell_number":
+      return "Choisissez un numéro Retell avant de continuer.";
     case "missing_company":
       return "Impossible de trouver l'entreprise liée à ce compte.";
     case "number_unavailable":
       return "Ce numéro est déjà réservé par un autre client.";
     case "trial_expired":
       return "L'essai est terminé. Activez le plan pour assigner un numéro.";
-    case "Missing VAPI_API_KEY.":
-      return "Ajoutez VAPI_API_KEY dans Vercel pour charger les numéros disponibles.";
+    case "Missing RETELL_API_KEY.":
+      return "Ajoutez RETELL_API_KEY dans Vercel pour charger les numéros Retell.";
     default:
       return error ? `Erreur configuration: ${error}` : null;
   }
@@ -77,7 +77,7 @@ function formatSetupError(error) {
 function formatSetupSuccess(value) {
   switch (value) {
     case "number_assigned":
-      return "Numéro de transfert assigné.";
+      return "Numéro Retell assigné.";
     case "number_released":
       return "Numéro libéré.";
     default:
@@ -201,29 +201,29 @@ export default async function DashboardPage({ searchParams }) {
       : Promise.resolve({ data: [] }),
     profile?.company_id
       ? admin
-          .from("vapi_phone_numbers")
-          .select("vapi_phone_number_id, phone_number, vapi_assistant_id, label")
+          .from("retell_phone_assignments")
+          .select("phone_number, phone_number_pretty, nickname, inbound_agent_id, outbound_agent_id, phone_number_type")
           .eq("company_id", profile.company_id)
           .maybeSingle()
       : Promise.resolve({ data: null }),
     admin
-      .from("vapi_phone_numbers")
-      .select("vapi_phone_number_id"),
+      .from("retell_phone_assignments")
+      .select("phone_number, company_id"),
   ]);
 
-  let vapiNumbers = [];
-  let vapiNumbersError = null;
+  let retellNumbers = [];
+  let retellNumbersError = null;
 
   try {
-    vapiNumbers = await listVapiPhoneNumbers();
+    retellNumbers = await listRetellPhoneNumbers();
   } catch (error) {
-    vapiNumbersError = error.message;
+    retellNumbersError = error.message;
   }
 
-  const assignedIds = new Set((assignedRows || []).map((row) => row.vapi_phone_number_id));
-  const availableNumbers = vapiNumbers.filter(
+  const assignedIds = new Set((assignedRows || []).map((row) => row.phone_number));
+  const availableNumbers = retellNumbers.filter(
     (phoneNumber) =>
-      phoneNumber.id === companyAssignment?.vapi_phone_number_id || !assignedIds.has(phoneNumber.id),
+      phoneNumber.id === companyAssignment?.phone_number || !assignedIds.has(phoneNumber.id),
   );
   const numbersPageSize = 5;
   const totalPages = Math.max(1, Math.ceil(availableNumbers.length / numbersPageSize));
@@ -234,11 +234,8 @@ export default async function DashboardPage({ searchParams }) {
   );
 
   const retellInboundNumber = findInboundNumberForCompany(profile?.company_id || null);
-  const selectedNumber = companyAssignment
-    ? availableNumbers.find((phoneNumber) => phoneNumber.id === companyAssignment.vapi_phone_number_id) ||
-      null
-    : null;
-  const activeInboundNumber = companyAssignment?.phone_number || retellInboundNumber || null;
+  const activeInboundNumber =
+    companyAssignment?.phone_number_pretty || companyAssignment?.phone_number || retellInboundNumber || null;
 
   const statusPill = isPaid ? "Actif" : trial.isExpired ? "Essai terminé" : "Essai";
   const statusLabel = isPaid
@@ -284,7 +281,7 @@ export default async function DashboardPage({ searchParams }) {
           <div>
             <p className="eyebrow">Opérations</p>
             <h1 className="title-lg">{companyName}</h1>
-            <p className="text-muted">Numéro de transfert, appels du jour et état du compte.</p>
+            <p className="text-muted">Numéro Retell, appels du jour et état du compte.</p>
           </div>
 
           <div className="hero-actions-compact">
@@ -353,7 +350,7 @@ export default async function DashboardPage({ searchParams }) {
               <p className="text-muted">
                 {trial.isExpired
                   ? "Le compte reste visible, mais les nouvelles assignations de numéros sont bloquées jusqu'à l'activation du plan."
-                  : "Passez au plan payant maintenant pour éviter l'interruption du numéro de transfert à la fin de l'essai."}
+                  : "Passez au plan payant maintenant pour éviter l'interruption du numéro Retell à la fin de l'essai."}
               </p>
             </div>
             <UpgradeForm
@@ -387,8 +384,8 @@ export default async function DashboardPage({ searchParams }) {
           <article className="card operations-card">
             <div className="section-head">
               <div>
-                <p className="eyebrow">Transfert</p>
-                <h2>Numéro client</h2>
+                <p className="eyebrow">Retell</p>
+                <h2>Numéro Retell</h2>
               </div>
             </div>
 
@@ -397,15 +394,15 @@ export default async function DashboardPage({ searchParams }) {
               <strong>{activeInboundNumber || "Non configuré"}</strong>
               <p className="text-muted">
                 {companyAssignment
-                  ? "Ce numéro est retiré de la liste disponible dès qu'il est assigné."
+                  ? "Ce numéro est retiré de la liste Retell dès qu'il est assigné."
                   : retellInboundNumber
                     ? "Numéro inbound Retell configuré via l'environnement de production."
-                    : "Ce numéro est retiré de la liste disponible dès qu'il est assigné."}
+                    : "Choisissez un numéro Retell disponible pour l'associer à ce compte."}
               </p>
             </div>
 
             {companyAssignment ? (
-              <form action={releaseTransferNumber}>
+              <form action={releaseRetellNumber}>
                 <ActionSubmitButton
                   className="button button-secondary"
                   idleLabel="Libérer le numéro"
@@ -418,17 +415,17 @@ export default async function DashboardPage({ searchParams }) {
           <article className="card operations-card">
             <div className="section-head">
               <div>
-                <p className="eyebrow">Disponibilité</p>
+                <p className="eyebrow">Inventaire</p>
                 <h2>Numéros disponibles</h2>
               </div>
               <span className="pill pill-neutral">{availableNumbers.length}</span>
             </div>
 
-            {vapiNumbersError ? (
-              <div className="alert alert-error">Erreur numéros: {vapiNumbersError}</div>
+            {retellNumbersError ? (
+              <div className="alert alert-error">Erreur numéros: {retellNumbersError}</div>
             ) : null}
 
-            {!vapiNumbersError && !availableNumbers.length ? (
+            {!retellNumbersError && !availableNumbers.length ? (
               <p className="text-muted">Aucun numéro libre pour le moment.</p>
             ) : null}
 
@@ -439,30 +436,28 @@ export default async function DashboardPage({ searchParams }) {
               </div>
             ) : null}
 
-            {!vapiNumbersError && paginatedNumbers.length ? (
+            {!retellNumbersError && paginatedNumbers.length ? (
               <div className="number-list">
                 {paginatedNumbers.map((phoneNumber) => (
                   <article
                     className={`number-row ${
-                      companyAssignment?.vapi_phone_number_id === phoneNumber.id ? "number-row-active" : ""
+                      companyAssignment?.phone_number === phoneNumber.id ? "number-row-active" : ""
                     }`}
                     key={phoneNumber.id}
                   >
                     <div>
-                      <strong>{phoneNumber.number}</strong>
-                      <span>
-                        {phoneNumber.name || "Sans nom"}
-                      </span>
+                      <strong>{phoneNumber.displayNumber}</strong>
+                      <span>{phoneNumber.name || "Sans nom"}</span>
                     </div>
                     <div className="number-row-actions">
-                      <span className="pill pill-neutral">{phoneNumber.status}</span>
-                      {companyAssignment?.vapi_phone_number_id === phoneNumber.id ? (
+                      <span className="pill pill-neutral">{phoneNumber.phoneNumberType || "Retell"}</span>
+                      {companyAssignment?.phone_number === phoneNumber.id ? (
                         <span className="pill pill-neutral">Choisi</span>
                       ) : !canAssignNumber ? (
                         <span className="pill pill-neutral">Plan requis</span>
                       ) : (
-                        <form action={assignTransferNumber} className="inline-action-form">
-                          <input name="vapiPhoneNumberId" type="hidden" value={phoneNumber.id} readOnly />
+                        <form action={assignRetellNumber} className="inline-action-form">
+                          <input name="retellPhoneNumberId" type="hidden" value={phoneNumber.id} readOnly />
                           <ActionSubmitButton
                             className="button button-secondary button-inline"
                             idleLabel="Choisir"
@@ -476,7 +471,7 @@ export default async function DashboardPage({ searchParams }) {
               </div>
             ) : null}
 
-            {!vapiNumbersError && totalPages > 1 ? (
+            {!retellNumbersError && totalPages > 1 ? (
               <div className="pagination-row">
                 <a
                   className={`button button-secondary button-inline ${

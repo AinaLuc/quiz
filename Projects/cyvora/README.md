@@ -10,8 +10,8 @@ Application `Next.js + Supabase Auth` pour `Cyvora`, une IA réceptionniste HVAC
 - Connexion et inscription avec Google via Supabase OAuth
 - Dashboard protégé avec métriques principales
 - Gestion simple de l'essai gratuit basée sur une société créée dans Supabase
-- Webhook Vapi vers Supabase pour afficher les appels et rendez-vous
 - Webhook Retell vers Supabase pour afficher les appels et rendez-vous
+- Inventaire Retell des numéros avec assignation par société
 
 ## 1. Installer les dépendances
 
@@ -38,6 +38,7 @@ Variables requises:
 - `RETELL_INBOUND_COMPANY_ID`
 - `RETELL_INBOUND_AGENT_ID` (optionnel)
 - `RETELL_INBOUND_PHONE_NUMBER` (optionnel)
+- `RETELL_INBOUND_NUMBER_MAP` (optionnel, JSON pour multi-numéros)
 - `VAPI_WEBHOOK_SECRET`
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
@@ -77,6 +78,7 @@ Ce script crée:
 - `public.calls`
 - `public.appointments`
 - `public.subscriptions`
+- `public.retell_phone_assignments`
 - les politiques RLS
 - un trigger qui crée automatiquement une entreprise et un profil lors d'un nouveau signup
 
@@ -94,31 +96,7 @@ Puis ouvrir:
 http://localhost:3000
 ```
 
-## 5. Connecter Vapi
-
-Configurez le Server URL de Vapi vers:
-
-```text
-https://votre-domaine.com/api/vapi
-```
-
-En local, utilisez un tunnel public puis pointez Vapi vers ce tunnel. Vapi documente `ngrok` et `vapi listen` pour le développement local:
-
-- https://docs.vapi.ai/cli/webhook
-- https://docs.vapi.ai/server-url/events
-
-Ajoutez aussi un secret partagé côté Vapi avec `Authorization: Bearer ...` ou `X-Vapi-Secret`, puis utilisez la même valeur dans `VAPI_WEBHOOK_SECRET`.
-
-Le flux est:
-
-1. Vapi envoie les événements de call à `/api/vapi`
-2. L'API route insère ou met à jour `calls`
-3. Si le payload indique un rendez-vous confirmé, l'API route crée ou met à jour `appointments`
-4. Le dashboard lit directement Supabase
-
-Si vous gérez plusieurs entreprises, ajoutez `companyId` dans les metadata de vos appels Vapi pour router les appels vers la bonne société.
-
-## 5b. Connecter Retell AI
+## 5. Connecter Retell AI
 
 Configurez le `Agent Level Webhook URL` de Retell vers:
 
@@ -138,7 +116,7 @@ Le flux est:
 2. L'API route vérifie `x-retell-signature` avec `RETELL_API_KEY`
 3. L'API route insère ou met à jour `calls`
 4. Si `call_analysis.custom_analysis_data` ou les variables collectées indiquent un rendez-vous confirmé, l'API route crée ou met à jour `appointments`
-5. Le dashboard lit directement Supabase
+5. Le dashboard lit directement Supabase pour les appels et l'assignation des numéros
 
 Si vous gérez plusieurs entreprises, ajoutez `companyId` dans `metadata` côté Retell pour router les appels vers la bonne société.
 
@@ -147,9 +125,10 @@ Important:
 - Retell demande le corps brut pour vérifier la signature.
 - Selon la documentation Retell, il faut utiliser une API key avec badge webhook pour la vérification.
 - Pour les appels entrants, vous pouvez configurer le numéro Retell avec un `Inbound Call Webhook URL` vers `https://votre-domaine.com/api/retell/inbound`.
-- Cette route renvoie `call_inbound.metadata.companyId` à partir de `RETELL_INBOUND_COMPANY_ID`.
-- `RETELL_INBOUND_PHONE_NUMBER` permet d'afficher le numéro Retell directement dans le dashboard même sans assignation Vapi.
-- Le sélecteur de numéros dans le dashboard est encore branché sur Vapi. Cette mise à jour ajoute le webhook Retell, pas encore la gestion des numéros Retell.
+- Cette route résout d'abord le `to_number` dans la table `retell_phone_assignments`, puis renvoie `call_inbound.metadata.companyId`.
+- Si aucun enregistrement n'existe, elle retombe sur `RETELL_INBOUND_COMPANY_ID` et `RETELL_INBOUND_NUMBER_MAP`.
+- `RETELL_INBOUND_PHONE_NUMBER` reste un fallback d'affichage.
+- Le dashboard utilise la liste live des numéros Retell et stocke seulement les assignations par société dans `retell_phone_assignments`.
 
 ## 6. Connecter Stripe
 
@@ -217,6 +196,6 @@ Le flux est:
 ## Suite recommandée
 
 - Ajouter Stripe pour le passage après essai gratuit
-- Mapper explicitement les `structuredData` Vapi vers vos champs métier HVAC
+- Mapper explicitement les `structuredData` Retell vers vos champs métier HVAC
 - Ajouter l'affichage des transcriptions et résumés d'appel
 - Ajouter rôles équipe / admin
