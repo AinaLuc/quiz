@@ -7,6 +7,12 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { listRetellPhoneNumbers } from "@/lib/retell-management";
 import {
+  bindRetellPhoneNumber,
+  cleanupRetellAgent,
+  ensureCompanyRetellAgent,
+  unbindRetellPhoneNumber,
+} from "@/lib/retell-provisioning";
+import {
   buildTrialExpiredEmail,
   buildTrialReminderEmail,
   sendTransactionalEmail,
@@ -23,9 +29,19 @@ function getOrigin(headersList) {
   return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 }
 
-function isCompanyEligibleForNumberAssignment(company) {
+function isCompanyEligibleForNumberAssignment(company, { hadPreviousAssignment = false } = {}) {
   if (!company) {
     return false;
+  }
+
+  // A company that already has a Retell agent configured can always reassign a number.
+  if (company.retell_agent_id || company.retell_llm_id) {
+    return true;
+  }
+
+  // A company that completed onboarding (had a number assigned at least once) can reassign.
+  if (company.first_number_assigned_at || hadPreviousAssignment) {
+    return true;
   }
 
   if (["active", "trialing"].includes(company.billing_status)) {
@@ -120,6 +136,8 @@ export async function signOut() {
 export async function assignRetellNumber(formData) {
   const supabase = await createClient();
   const admin = createAdminClient();
+  const headerStore = await headers();
+  const origin = getOrigin(headerStore);
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -147,7 +165,7 @@ export async function assignRetellNumber(formData) {
 
   const { data: profile } = await admin
     .from("profiles")
-    .select("company_id")
+    .select("company_id, full_name")
     .eq("id", user.id)
     .single();
 
@@ -157,17 +175,25 @@ export async function assignRetellNumber(formData) {
 
   const { data: company } = await admin
     .from("companies")
-    .select("billing_status, trial_ends_at")
+    .select("name, billing_status, trial_ends_at, retell_agent_id, retell_llm_id, retell_base_general_prompt, first_number_assigned_at")
     .eq("id", profile.company_id)
     .maybeSingle();
 
-  if (!isCompanyEligibleForNumberAssignment(company)) {
+  // Check if the company has ever had a phone assignment (even if already released),
+  // which means they had completed onboarding during an active trial.
+  const { count: previousAssignmentCount } = await admin
+    .from("retell_phone_assignments")
+    .select("*", { count: "exact", head: true })
+    .eq("company_id", profile.company_id);
+  const hadPreviousAssignment = (previousAssignmentCount || 0) > 0;
+
+  if (!isCompanyEligibleForNumberAssignment(company, { hadPreviousAssignment })) {
     redirect("/dashboard?setupError=trial_expired");
   }
 
   const { data: existingAssignment } = await admin
     .from("retell_phone_assignments")
-    .select("company_id")
+    .select("company_id, phone_number, inbound_agent_id, outbound_agent_id")
     .eq("phone_number", retellPhoneNumberId)
     .maybeSingle();
 
@@ -175,21 +201,116 @@ export async function assignRetellNumber(formData) {
     redirect("/dashboard?setupError=number_unavailable");
   }
 
+  const { data: existingCompanyAssignment } = await admin
+    .from("retell_phone_assignments")
+    .select("phone_number, inbound_agent_id, outbound_agent_id")
+    .eq("company_id", profile.company_id)
+    .maybeSingle();
+
+  const companyAssignmentRow = existingCompanyAssignment || null;
+  const companyRetellAgentId =
+    company?.retell_agent_id ||
+    companyAssignmentRow?.inbound_agent_id ||
+    companyAssignmentRow?.outbound_agent_id ||
+    null;
+
+  const companyRetellLlmId = company?.retell_llm_id || null;
+  const companyBasePrompt = company?.retell_base_general_prompt || "";
+  const companyDisplayName = company?.name || profile.full_name || "Votre entreprise";
+  const previousCompanyRetellState = {
+    retell_agent_id: company?.retell_agent_id || null,
+    retell_llm_id: company?.retell_llm_id || null,
+    retell_base_general_prompt: company?.retell_base_general_prompt || null,
+  };
+
+  let retellAgent;
+
+  try {
+    retellAgent = await ensureCompanyRetellAgent({
+      companyName: companyDisplayName,
+      existingAgentId: companyRetellAgentId,
+      existingLlmId: companyRetellLlmId,
+      existingBasePrompt: companyBasePrompt,
+    });
+  } catch (error) {
+    redirect(`/dashboard?setupError=${encodeURIComponent(error.message)}`);
+  }
+
+  const previousPhoneNumber = companyAssignmentRow?.phone_number || null;
+
+  try {
+    await bindRetellPhoneNumber({
+      phoneNumber: selectedPhoneNumber.phoneNumber,
+      agentId: retellAgent.agentId,
+      displayName: companyDisplayName,
+      webhookUrl: `${origin}/api/retell/inbound`,
+    });
+  } catch (error) {
+    if (retellAgent.wasCreated) {
+      await cleanupRetellAgent({
+        agentId: retellAgent.agentId,
+        llmId: retellAgent.llmId,
+      });
+    }
+
+    redirect(`/dashboard?setupError=${encodeURIComponent(error.message)}`);
+  }
+
+  const { error: companyUpdateError } = await admin
+    .from("companies")
+    .update({
+      retell_agent_id: retellAgent.agentId,
+      retell_llm_id: retellAgent.llmId,
+      retell_base_general_prompt: retellAgent.basePrompt,
+      // Permanently mark that this company completed onboarding by assigning a number.
+      ...(!company?.first_number_assigned_at ? { first_number_assigned_at: new Date().toISOString() } : {}),
+    })
+    .eq("id", profile.company_id);
+
+  if (companyUpdateError) {
+    await unbindRetellPhoneNumber(selectedPhoneNumber.phoneNumber).catch(() => null);
+    if (retellAgent.wasCreated) {
+      await cleanupRetellAgent({
+        agentId: retellAgent.agentId,
+        llmId: retellAgent.llmId,
+      });
+    }
+
+    redirect(`/dashboard?setupError=${encodeURIComponent(companyUpdateError.message)}`);
+  }
+
   const { error } = await admin.from("retell_phone_assignments").upsert(
     {
       company_id: profile.company_id,
       phone_number: selectedPhoneNumber.phoneNumber,
       phone_number_pretty: selectedPhoneNumber.displayNumber,
-      nickname: selectedPhoneNumber.name,
-      inbound_agent_id: selectedPhoneNumber.inboundAgentId,
-      outbound_agent_id: selectedPhoneNumber.outboundAgentId,
+      nickname: selectedPhoneNumber.name || companyDisplayName,
+      inbound_agent_id: retellAgent.agentId,
+      outbound_agent_id: retellAgent.agentId,
       phone_number_type: selectedPhoneNumber.phoneNumberType,
     },
     { onConflict: "company_id" },
   );
 
   if (error) {
+    await unbindRetellPhoneNumber(selectedPhoneNumber.phoneNumber).catch(() => null);
+    await admin
+      .from("companies")
+      .update(previousCompanyRetellState)
+      .eq("id", profile.company_id)
+      .catch(() => null);
+    if (retellAgent.wasCreated) {
+      await cleanupRetellAgent({
+        agentId: retellAgent.agentId,
+        llmId: retellAgent.llmId,
+      });
+    }
+
     redirect(`/dashboard?setupError=${encodeURIComponent(error.message)}`);
+  }
+
+  if (previousPhoneNumber && previousPhoneNumber !== selectedPhoneNumber.phoneNumber) {
+    await unbindRetellPhoneNumber(previousPhoneNumber).catch(() => null);
   }
 
   revalidatePath("/dashboard");
@@ -215,6 +336,16 @@ export async function releaseRetellNumber() {
 
   if (!profile?.company_id) {
     redirect("/dashboard?setupError=missing_company");
+  }
+
+  const { data: assignment } = await admin
+    .from("retell_phone_assignments")
+    .select("phone_number")
+    .eq("company_id", profile.company_id)
+    .maybeSingle();
+
+  if (assignment?.phone_number) {
+    await unbindRetellPhoneNumber(assignment.phone_number).catch(() => null);
   }
 
   const { error } = await admin

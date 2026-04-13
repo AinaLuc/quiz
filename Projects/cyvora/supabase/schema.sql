@@ -8,6 +8,10 @@ create table if not exists public.companies (
   trial_ends_at timestamptz not null default (timezone('utc', now()) + interval '10 days'),
   billing_status text not null default 'trial_active',
   plan text not null default 'trial',
+  retell_agent_id text,
+  retell_llm_id text,
+  retell_base_general_prompt text,
+  first_number_assigned_at timestamptz,
   trial_reminder_sent_at timestamptz,
   trial_expired_email_sent_at timestamptz,
   stripe_customer_id text,
@@ -99,6 +103,10 @@ create table if not exists public.retell_phone_assignments (
 
 alter table public.companies add column if not exists billing_status text not null default 'trial_active';
 alter table public.companies add column if not exists plan text not null default 'trial';
+alter table public.companies add column if not exists retell_agent_id text;
+alter table public.companies add column if not exists retell_llm_id text;
+alter table public.companies add column if not exists retell_base_general_prompt text;
+alter table public.companies add column if not exists first_number_assigned_at timestamptz;
 alter table public.companies add column if not exists trial_reminder_sent_at timestamptz;
 alter table public.companies add column if not exists trial_expired_email_sent_at timestamptz;
 alter table public.companies add column if not exists stripe_customer_id text;
