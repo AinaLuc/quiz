@@ -8,7 +8,6 @@ import { getDisplayName, getTrialWindow } from "@/lib/auth";
 import { formatIncludedMinutes, getBillingPlan } from "@/lib/billing-config";
 import { ensureProfileRecords } from "@/lib/profile";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { findInboundNumberForCompany } from "@/lib/retell-inbound-config";
 import { listRetellPhoneNumbers } from "@/lib/retell-management";
 import { createClient } from "@/lib/supabase/server";
 
@@ -232,9 +231,7 @@ export default async function DashboardPage({ searchParams }) {
     currentPage * numbersPageSize,
   );
 
-  const retellInboundNumber = findInboundNumberForCompany(profile?.company_id || null);
-  const activeInboundNumber =
-    companyAssignment?.phone_number_pretty || companyAssignment?.phone_number || retellInboundNumber || null;
+  const activeInboundNumber = companyAssignment?.phone_number_pretty || companyAssignment?.phone_number || null;
 
   const statusPill = isPaid ? "Actif" : trial.isExpired ? "Essai terminé" : "Essai";
   const statusLabel = isPaid
@@ -394,9 +391,7 @@ export default async function DashboardPage({ searchParams }) {
               <p className="text-muted">
                 {companyAssignment
                   ? "Ce numéro est retiré de la liste Retell dès qu'il est assigné."
-                  : retellInboundNumber
-                    ? "Numéro inbound Retell configuré via l'environnement de production."
-                    : "Choisissez un numéro Retell disponible pour l'associer à ce compte."}
+                  : "Choisissez un numéro Retell disponible pour l'associer à ce compte."}
               </p>
             </div>
 
