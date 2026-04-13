@@ -29,10 +29,14 @@ export async function listRetellPhoneNumbers() {
       displayNumber: phoneNumber.phone_number_pretty || phoneNumber.phone_number,
       name: phoneNumber.nickname || null,
       inboundAgentId: phoneNumber.inbound_agent_id || null,
+      inboundAgents: Array.isArray(phoneNumber.inbound_agents) ? phoneNumber.inbound_agents : [],
       outboundAgentId: phoneNumber.outbound_agent_id || null,
       phoneNumberType: phoneNumber.phone_number_type || null,
       inboundWebhookUrl: phoneNumber.inbound_webhook_url || null,
       lastModifiedAt: phoneNumber.last_modification_timestamp || null,
+      isAssigned:
+        Boolean(phoneNumber.inbound_agent_id) ||
+        (Array.isArray(phoneNumber.inbound_agents) && phoneNumber.inbound_agents.length > 0),
     }))
     .sort((left, right) => left.displayNumber.localeCompare(right.displayNumber));
 }

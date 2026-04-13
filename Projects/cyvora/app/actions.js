@@ -141,6 +141,10 @@ export async function assignRetellNumber(formData) {
     redirect("/dashboard?setupError=missing_retell_number");
   }
 
+  if (selectedPhoneNumber.isAssigned) {
+    redirect("/dashboard?setupError=number_unavailable");
+  }
+
   const { data: profile } = await admin
     .from("profiles")
     .select("company_id")
