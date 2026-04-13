@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { ActionSubmitButton } from "@/components/action-submit-button";
-import { RetellDebugConsole } from "@/components/retell-debug-console";
 import { SiteHeader } from "@/components/site-header";
 import { UpgradeForm } from "@/components/upgrade-form";
 import { assignRetellNumber, releaseRetellNumber, sendTrialLifecycleTest } from "@/app/actions";
@@ -59,15 +58,15 @@ function getCurrentMonthStartIso() {
 function formatSetupError(error) {
   switch (error) {
     case "missing_retell_number":
-      return "Choisissez un numéro Retell avant de continuer.";
+      return "Choisissez un numéro avant de continuer.";
     case "missing_company":
       return "Impossible de trouver l'entreprise liée à ce compte.";
     case "number_unavailable":
       return "Ce numéro est déjà réservé par un autre client.";
     case "trial_expired":
       return "L'essai est terminé. Activez le plan pour assigner un numéro.";
-    case "Missing RETELL_API_KEY.":
-      return "Ajoutez RETELL_API_KEY dans Vercel pour charger les numéros Retell.";
+    case "Missing API key.":
+      return "Ajoutez la clé API dans Vercel pour charger les numéros.";
     default:
       return error ? `Erreur configuration: ${error}` : null;
   }
@@ -76,7 +75,7 @@ function formatSetupError(error) {
 function formatSetupSuccess(value) {
   switch (value) {
     case "number_assigned":
-      return "Numéro Retell assigné.";
+      return "Numéro assigné.";
     case "number_released":
       return "Numéro libéré.";
     default:
@@ -271,13 +270,11 @@ export default async function DashboardPage({ searchParams }) {
       <SiteHeader session={{ user }} />
 
       <main className="dashboard-main">
-        <RetellDebugConsole calls={latestCalls || []} />
-
         <section className="dashboard-hero panel">
           <div>
             <p className="eyebrow">Opérations</p>
             <h1 className="title-lg">{companyName}</h1>
-            <p className="text-muted">Numéro Retell, appels du jour et état du compte.</p>
+            <p className="text-muted">Numéro principal, appels du jour et état du compte.</p>
           </div>
 
           <div className="hero-actions-compact">
@@ -346,7 +343,7 @@ export default async function DashboardPage({ searchParams }) {
               <p className="text-muted">
                 {trial.isExpired
                   ? "Le compte reste visible, mais les nouvelles assignations de numéros sont bloquées jusqu'à l'activation du plan."
-                  : "Passez au plan payant maintenant pour éviter l'interruption du numéro Retell à la fin de l'essai."}
+                  : "Passez au plan payant maintenant pour éviter l'interruption du numéro à la fin de l'essai."}
               </p>
             </div>
             <UpgradeForm
@@ -380,8 +377,8 @@ export default async function DashboardPage({ searchParams }) {
           <article className="card operations-card">
             <div className="section-head">
               <div>
-                <p className="eyebrow">Retell</p>
-                <h2>Numéro Retell</h2>
+                <p className="eyebrow">Numéro</p>
+                <h2>Numéro principal</h2>
               </div>
             </div>
 
@@ -390,8 +387,8 @@ export default async function DashboardPage({ searchParams }) {
               <strong>{activeInboundNumber || "Non configuré"}</strong>
               <p className="text-muted">
                 {companyAssignment
-                  ? "Ce numéro est retiré de la liste Retell dès qu'il est assigné."
-                  : "Choisissez un numéro Retell disponible pour l'associer à ce compte."}
+                  ? "Ce numéro est retiré de la liste dès qu'il est assigné."
+                  : "Choisissez un numéro disponible pour l'associer à ce compte."}
               </p>
             </div>
 
@@ -416,7 +413,9 @@ export default async function DashboardPage({ searchParams }) {
             </div>
 
             {retellNumbersError ? (
-              <div className="alert alert-error">Erreur numéros: {retellNumbersError}</div>
+              <div className="alert alert-error">
+                Erreur numéros: impossible de charger la liste.
+              </div>
             ) : null}
 
             {!retellNumbersError && !availableNumbers.length ? (
@@ -444,7 +443,7 @@ export default async function DashboardPage({ searchParams }) {
                       <span>{phoneNumber.name || "Sans nom"}</span>
                     </div>
                     <div className="number-row-actions">
-                      <span className="pill pill-neutral">{phoneNumber.phoneNumberType || "Retell"}</span>
+                      <span className="pill pill-neutral">Standard</span>
                       {companyAssignment?.phone_number === phoneNumber.id ? (
                         <span className="pill pill-neutral">Choisi</span>
                       ) : !canAssignNumber ? (

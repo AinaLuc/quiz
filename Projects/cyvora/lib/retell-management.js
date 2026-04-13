@@ -5,7 +5,7 @@ function getRetellApiKey() {
   const apiKey = process.env.RETELL_API_KEY;
 
   if (!apiKey || apiKey.startsWith("replace-with-")) {
-    throw new Error("Missing RETELL_API_KEY.");
+    throw new Error("Missing API key.");
   }
 
   return apiKey;
