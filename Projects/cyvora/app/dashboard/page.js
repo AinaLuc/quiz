@@ -530,6 +530,12 @@ export default async function DashboardPage({ searchParams }) {
                       {!call.summary && call.transcript ? (
                         <span>{excerptText(call.transcript, 140)}</span>
                       ) : null}
+                      {call.transcript ? (
+                        <details className="call-transcript">
+                          <summary>Voir la transcription complète</summary>
+                          <div className="call-transcript-body">{call.transcript}</div>
+                        </details>
+                      ) : null}
                     </div>
                     <span className="pill pill-neutral">
                       {call.booking_status || call.urgency || "reçu"}

@@ -668,6 +668,35 @@ img {
   min-width: 0;
 }
 
+.call-transcript {
+  margin-top: 4px;
+}
+
+.call-transcript summary {
+  cursor: pointer;
+  color: var(--primary);
+  font-size: 0.92rem;
+  font-weight: 600;
+  list-style: none;
+  outline: none;
+}
+
+.call-transcript summary::-webkit-details-marker {
+  display: none;
+}
+
+.call-transcript-body {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .number-row-actions {
   display: flex;
   align-items: center;
