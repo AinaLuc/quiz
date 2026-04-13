@@ -221,10 +221,7 @@ export default async function DashboardPage({ searchParams }) {
   }
 
   const assignedIds = new Set((assignedRows || []).map((row) => row.phone_number));
-  const availableNumbers = retellNumbers.filter(
-    (phoneNumber) =>
-      phoneNumber.id === companyAssignment?.phone_number || !assignedIds.has(phoneNumber.id),
-  );
+  const availableNumbers = retellNumbers.filter((phoneNumber) => !assignedIds.has(phoneNumber.id));
   const numbersPageSize = 5;
   const totalPages = Math.max(1, Math.ceil(availableNumbers.length / numbersPageSize));
   const currentPage = Math.min(page, totalPages);
