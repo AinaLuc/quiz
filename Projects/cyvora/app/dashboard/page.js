@@ -2,7 +2,12 @@ import { redirect } from "next/navigation";
 import { ActionSubmitButton } from "@/components/action-submit-button";
 import { SiteHeader } from "@/components/site-header";
 import { UpgradeForm } from "@/components/upgrade-form";
-import { assignRetellNumber, releaseRetellNumber, sendTrialLifecycleTest } from "@/app/actions";
+import {
+  assignRetellNumber,
+  releaseRetellNumber,
+  sendTrialLifecycleTest,
+  updateCalcomConfig,
+} from "@/app/actions";
 import { getDisplayName, getTrialWindow } from "@/lib/auth";
 import { formatIncludedMinutes, getBillingPlan } from "@/lib/billing-config";
 import { ensureProfileRecords } from "@/lib/profile";
