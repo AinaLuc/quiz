@@ -231,6 +231,8 @@ export async function assignRetellNumber(formData) {
       existingAgentId: companyRetellAgentId,
       existingLlmId: companyRetellLlmId,
       existingBasePrompt: companyBasePrompt,
+      calcomApiKey: company?.calcom_api_key,
+      calcomEventTypeId: company?.calcom_event_type_id,
     });
   } catch (error) {
     redirect(`/dashboard?setupError=${encodeURIComponent(error.message)}`);
@@ -424,4 +426,83 @@ export async function sendTrialLifecycleTest(formData) {
 
   revalidatePath("/dashboard");
   redirect(`/dashboard?emailTest=${encodeURIComponent(kind)}`);
+}
+
+export async function updateCalcomConfig(formData) {
+  const supabase = await createClient();
+  const admin = createAdminClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/signin");
+  }
+
+  const apiKey = formData.get("apiKey")?.toString();
+  const eventTypeId = formData.get("eventTypeId")?.toString();
+
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("company_id")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile?.company_id) {
+    redirect("/dashboard?setupError=missing_company");
+  }
+
+  const { error } = await admin
+    .from("companies")
+    .update({
+      calcom_api_key: apiKey || null,
+      calcom_event_type_id: eventTypeId || null,
+    })
+    .eq("id", profile.company_id);
+
+  if (error) {
+    redirect(`/dashboard?setupError=${encodeURIComponent(error.message)}`);
+  }
+
+  const { data: company } = await admin
+    .from("companies")
+    .select("name, retell_agent_id, retell_llm_id, retell_base_general_prompt")
+    .eq("id", profile.company_id)
+    .single();
+
+  if (company?.retell_agent_id) {
+    try {
+      await ensureCompanyRetellAgent({
+        companyName: company.name,
+        existingAgentId: company.retell_agent_id,
+        existingLlmId: company.retell_llm_id,
+        existingBasePrompt: company.retell_base_general_prompt,
+        calcomApiKey: apiKey,
+        calcomEventTypeId: eventTypeId,
+      });
+    } catch (error) {
+      console.error("Failed to update Retell agent with Cal.com config:", error);
+    }
+  }
+
+  revalidatePath("/dashboard");
+  redirect("/dashboard?setup=calcom_updated");
+}
+
+export async function fetchCalcomEventTypesAction(formData) {
+  const apiKey = formData.get("apiKey")?.toString();
+
+  if (!apiKey) {
+    redirect("/dashboard?setupError=missing_calcom_api_key");
+  }
+
+  try {
+    const eventTypes = await fetchCalcomEventTypes(apiKey);
+    // Since we can't easily return data to the page from a server action redirect,
+    // we might need a different approach or just store the API key and let the page fetch them.
+    // For now, let's just save the API key.
+    return eventTypes;
+  } catch (error) {
+    redirect(`/dashboard?setupError=${encodeURIComponent(error.message)}`);
+  }
 }

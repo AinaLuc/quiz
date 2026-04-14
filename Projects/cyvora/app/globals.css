@@ -733,20 +733,45 @@ img {
 }
 
 .metric-card-accent {
-  background: linear-gradient(180deg, rgba(14, 118, 110, 0.14), rgba(255, 250, 242, 0.86));
+  background: linear-gradient(180deg, rgba(14, 110, 110, 0.14), rgba(255, 250, 242, 0.86));
 }
 
-.metric-card {
-  min-width: 0;
+.calcom-form {
+  display: grid;
+  gap: 16px;
 }
 
-.metric-card small {
-  display: block;
-  margin-top: 8px;
-  color: var(--muted);
-  font-size: 0.88rem;
-  line-height: 1.45;
-  overflow-wrap: anywhere;
+.form-group {
+  display: grid;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.input {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid rgba(19, 38, 29, 0.14);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text);
+  width: 100%;
+}
+
+.input:focus {
+  outline: 2px solid rgba(14, 118, 110, 0.22);
+  border-color: rgba(14, 118, 110, 0.34);
+}
+
+.text-error {
+  color: var(--danger);
+}
+
+.small {
+  font-size: 0.85rem;
 }
 
 .insight-grid {

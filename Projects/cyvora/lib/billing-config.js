@@ -22,3 +22,15 @@ export const BILLING_PLANS = {
 export function getBillingPlan(planKey) {
   return BILLING_PLANS[planKey] || null;
 }
+
+export function formatIncludedMinutes(plan) {
+  if (!plan) {
+    return null;
+  }
+
+  if (plan.isUnlimited) {
+    return "Illimite";
+  }
+
+  return `${plan.includedMinutesPerMonth} min/mo`;
+}

@@ -14,40 +14,22 @@ export default function RootLayout({ children }) {
         <footer className="site-footer" aria-label="Business information">
           <div className="site-footer-inner">
             <div className="site-footer-brand">
-              <strong>BRANDEO AI LLC</strong>
-              <span>Principal Office Address</span>
+              <strong>MONINA</strong>
             </div>
 
             <div className="site-footer-copy">
               <p>
-                <span>Type</span>
-                <strong>Limited Liability Company</strong>
+                <span>Registration number</span>
+                <strong>1000451503</strong>
               </p>
               <p>
-                <span>Charter No.</span>
-                <strong>LC014508483</strong>
+                <span>Business type</span>
+                <strong>General Partnership</strong>
               </p>
+              <p>6d - 7398 Yonge St, #1192, Thornhill, Ontario, L4J8J2</p>
               <p>
-                <span>Domesticity</span>
-                <strong>Domestic</strong>
-              </p>
-              <p>
-                <span>Home State</span>
-              </p>
-              <p>
-                <span>Registered Agent</span>
-                <strong>INCORP SERVICES, INC.</strong>
-              </p>
-              <p>1531 E Bradford Pkwy</p>
-              <p>Ste 200</p>
-              <p>Springfield, MO 65804-6564</p>
-              <p>
-                <span>Status</span>
-                <strong>Active</strong>
-              </p>
-              <p>
-                <span>Date Formed</span>
-                <strong>11/24/2023</strong>
+                <span>Country</span>
+                <strong>Canada</strong>
               </p>
             </div>
           </div>

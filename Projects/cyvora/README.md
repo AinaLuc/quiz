@@ -35,6 +35,7 @@ Variables requises:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `RETELL_API_KEY`
+- `RETELL_TEMPLATE_AGENT_ID` (optionnel, agent modèle dupliqué pour chaque client)
 - `RETELL_INBOUND_COMPANY_ID`
 - `RETELL_INBOUND_AGENT_ID` (optionnel)
 - `RETELL_INBOUND_PHONE_NUMBER` (optionnel)
@@ -79,6 +80,9 @@ Ce script crée:
 - `public.appointments`
 - `public.subscriptions`
 - `public.retell_phone_assignments`
+- `public.companies.retell_agent_id`
+- `public.companies.retell_llm_id`
+- `public.companies.retell_base_general_prompt`
 - les politiques RLS
 - un trigger qui crée automatiquement une entreprise et un profil lors d'un nouveau signup
 
@@ -129,6 +133,7 @@ Important:
 - Si aucun enregistrement n'existe, elle retombe sur `RETELL_INBOUND_COMPANY_ID` et `RETELL_INBOUND_NUMBER_MAP`.
 - `RETELL_INBOUND_PHONE_NUMBER` reste un fallback d'affichage.
 - Le dashboard utilise la liste live des numéros Retell et stocke seulement les assignations par société dans `retell_phone_assignments`.
+- Lors de l'assignation d'un numéro, l'application duplique l'agent modèle Retell, injecte le nom de l'entreprise dans le prompt en français canadien, puis lie le numéro à cet agent.
 
 ## 6. Connecter Stripe
 

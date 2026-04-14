@@ -63,6 +63,12 @@ function formatSetupError(error) {
       return "Impossible de trouver l'entreprise liée à ce compte.";
     case "number_unavailable":
       return "Ce numéro est déjà réservé par un autre client.";
+    case "Missing Retell template agent ID.":
+      return "Configurez l'agent modèle Retell avant d'assigner un numéro.";
+    case "Retell template agent must use a Retell LLM.":
+      return "L'agent modèle Retell doit utiliser un moteur LLM Retell.";
+    case "The existing Retell agent is not attached to a Retell LLM.":
+      return "L'agent Retell existant est invalide.";
     case "trial_expired":
       return "L'essai est terminé. Activez le plan pour assigner un numéro.";
     case "Missing API key.":
@@ -78,6 +84,8 @@ function formatSetupSuccess(value) {
       return "Numéro assigné.";
     case "number_released":
       return "Numéro libéré.";
+    case "calcom_updated":
+      return "Configuration Cal.com mise à jour.";
     default:
       return null;
   }
@@ -143,11 +151,20 @@ export default async function DashboardPage({ searchParams }) {
     ? await supabase
         .from("companies")
         .select(
-          "id, name, trial_started_at, trial_ends_at, billing_status, plan, stripe_subscription_id",
+          "id, name, trial_started_at, trial_ends_at, billing_status, plan, stripe_subscription_id, calcom_api_key, calcom_event_type_id",
         )
         .eq("id", profile.company_id)
         .maybeSingle()
     : { data: null };
+
+  let calcomEventTypes = [];
+  if (company?.calcom_api_key) {
+    try {
+      calcomEventTypes = await fetchCalcomEventTypes(company.calcom_api_key);
+    } catch (error) {
+      console.error("Failed to fetch Cal.com event types:", error);
+    }
+  }
 
   const todayStart = getTodayStartIso();
   const currentMonthStart = getCurrentMonthStartIso();
@@ -532,6 +549,67 @@ export default async function DashboardPage({ searchParams }) {
                 ))}
               </div>
             )}
+          </article>
+
+          <article className="card operations-card">
+            <div className="section-head">
+              <div>
+                <p className="eyebrow">Intégration</p>
+                <h2>Cal.com</h2>
+              </div>
+              {company?.calcom_api_key && (
+                <span className="pill pill-neutral">Connecté</span>
+              )}
+            </div>
+
+            <p className="text-muted">
+              Liez votre compte Cal.com pour permettre à l&apos;assistant de prendre des rendez-vous.
+            </p>
+
+            <form action={updateCalcomConfig} className="calcom-form">
+              <div className="form-group">
+                <label htmlFor="apiKey">Clé API Cal.com</label>
+                <input
+                  id="apiKey"
+                  name="apiKey"
+                  type="password"
+                  defaultValue={company?.calcom_api_key || ""}
+                  placeholder="cal_live_..."
+                  className="input"
+                />
+              </div>
+
+              {company?.calcom_api_key && calcomEventTypes.length > 0 && (
+                <div className="form-group">
+                  <label htmlFor="eventTypeId">Type d&apos;événement</label>
+                  <select
+                    id="eventTypeId"
+                    name="eventTypeId"
+                    defaultValue={company?.calcom_event_type_id || ""}
+                    className="input"
+                  >
+                    <option value="">Sélectionner un événement</option>
+                    {calcomEventTypes.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.title} ({type.id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {company?.calcom_api_key && calcomEventTypes.length === 0 && (
+                <p className="text-error small">
+                  Aucun type d&apos;événement trouvé ou erreur de connexion.
+                </p>
+              )}
+
+              <ActionSubmitButton
+                className="button button-secondary"
+                idleLabel={company?.calcom_api_key ? "Mettre à jour" : "Connecter Cal.com"}
+                pendingLabel="Enregistrement..."
+              />
+            </form>
           </article>
 
           <article className="card operations-card">

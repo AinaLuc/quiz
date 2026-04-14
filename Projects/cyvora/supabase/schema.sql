@@ -111,6 +111,9 @@ alter table public.companies add column if not exists trial_reminder_sent_at tim
 alter table public.companies add column if not exists trial_expired_email_sent_at timestamptz;
 alter table public.companies add column if not exists stripe_customer_id text;
 alter table public.companies add column if not exists stripe_subscription_id text;
+alter table public.companies add column if not exists calcom_api_key text;
+alter table public.companies add column if not exists calcom_event_type_id text;
+alter table public.companies add column if not exists calcom_event_type_url text;
 
 alter table public.companies enable row level security;
 alter table public.profiles enable row level security;

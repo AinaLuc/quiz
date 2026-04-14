@@ -36,7 +36,8 @@ export async function listRetellPhoneNumbers() {
       lastModifiedAt: phoneNumber.last_modification_timestamp || null,
       isAssigned:
         Boolean(phoneNumber.inbound_agent_id) ||
-        (Array.isArray(phoneNumber.inbound_agents) && phoneNumber.inbound_agents.length > 0),
+        (Array.isArray(phoneNumber.inbound_agents) && phoneNumber.inbound_agents.length > 0) ||
+        Boolean(phoneNumber.inbound_webhook_url),
     }))
     .sort((left, right) => left.displayNumber.localeCompare(right.displayNumber));
 }
