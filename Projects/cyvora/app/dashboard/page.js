@@ -90,7 +90,7 @@ function formatSetupSuccess(value) {
     case "number_released":
       return "Numéro libéré.";
     case "calcom_updated":
-      return "Configuration Cal.com mise à jour.";
+      return "Configuration de l'agenda mise à jour.";
     default:
       return null;
   }
@@ -646,6 +646,14 @@ export default async function DashboardPage({ searchParams }) {
                   pendingLabel="Envoi..."
                 />
               </form>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+  );
+}
+         </form>
             </div>
           </article>
         </section>

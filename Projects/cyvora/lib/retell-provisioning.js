@@ -42,7 +42,7 @@ export function buildCompanyGeneralPrompt(companyName, basePrompt = "", isCalcom
 
   if (isCalcomEnabled) {
     introParts.push(
-      "Vous avez la capacité de vérifier les disponibilités et de prendre des rendez-vous directement sur notre calendrier.",
+      "Vous avez la capacité de vérifier les disponibilités et de planifier des rendez-vous directement sur l'agenda de l'entreprise.",
     );
   }
 
@@ -108,16 +108,16 @@ export async function ensureCompanyRetellAgent({
       ? [
           {
             type: "check_availability_cal",
-            name: "check_availability",
-            description: "Vérifier les disponibilités pour les 7 prochains jours.",
+            name: "verifier_disponibilites",
+            description: "Vérifier les disponibilités sur l'agenda pour les 7 prochains jours.",
             cal_api_key: calcomApiKey,
             event_type_id: Number(calcomEventTypeId),
             timezone: "America/Toronto",
           },
           {
             type: "book_appointment_cal",
-            name: "book_appointment",
-            description: "Prendre un rendez-vous une fois qu'un créneau est confirmé.",
+            name: "planifier_rendez_vous",
+            description: "Planifier un rendez-vous sur l'agenda une fois qu'un créneau est confirmé.",
             cal_api_key: calcomApiKey,
             event_type_id: Number(calcomEventTypeId),
             timezone: "America/Toronto",
