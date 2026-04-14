@@ -653,11 +653,3 @@ export default async function DashboardPage({ searchParams }) {
     </div>
   );
 }
-         </form>
-            </div>
-          </article>
-        </section>
-      </main>
-    </div>
-  );
-}
